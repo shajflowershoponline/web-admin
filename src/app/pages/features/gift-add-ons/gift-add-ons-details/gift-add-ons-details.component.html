@@ -1,0 +1,144 @@
+<mat-toolbar color="#fff" class="mat-elevation-z4">
+  <button [disabled]="isLoading" style="margin-right: 10px!important;" mat-icon-button
+    matTooltip="{{ isReadOnly? 'Back' : 'Cancel'}}"
+    [routerLink]="isReadOnly ? '/gift-add-ons/' : isNew ? '/gift-add-ons/': '/gift-add-ons/' + giftAddOnId">
+    <mat-icon>
+      {{
+        isReadOnly? 'keyboard_arrow_left' : 'close'
+      }}
+    </mat-icon>
+  </button>
+  <span class="toolbar-item-spacer"></span>
+  <div class="toolbar-action">
+    <button
+      *ngIf="!isNew && isReadOnly"
+      mat-raised-button
+      color="primary"
+      matTooltip="Delete"
+      (click)="onDeleteGiftAddOns()">
+      Delete
+    </button>
+    <button
+      mat-raised-button
+      color="primary"
+      matTooltip="Edit"
+      *ngIf="!isNew && isReadOnly"
+      routerLink="/gift-add-ons/{{giftAddOnId}}/edit"
+      replaceUrl="true"
+    >
+      Edit
+    </button>
+    <button
+      *ngIf="!isReadOnly"
+      mat-raised-button
+      color="primary"
+      matTooltip="{{isNew ? 'Save' : 'Update'}}"
+      [disabled]="!formIsReady && !formIsValid"
+      form="giftAddOnForm"
+      type="submit">
+      {{isNew ? 'Save' : 'Update'}}
+    </button>
+  </div>
+</mat-toolbar>
+<div class="content">
+  <div class="inner-content">
+    <h4 class="inner-content-title">Gift Add Ons details</h4>
+    <mat-card>
+      <mat-card-content>
+        <div fxFlex="100" class="content-inner" fxLayout="column">
+          <form
+            [formGroup]="giftAddOnForm"
+            fxLayout="row wrap"
+            id="giftAddOnForm"
+            (ngSubmit)="onSubmit()"
+            [ngClass]="{'readonly' : isReadOnly}"
+          >
+            <fieldset fxFlex="100" fxLayout="row wrap" style="row-gap: 16px">
+              <div fxFlex="100" fxLayout="column" fxLayout="row ">
+                <div class="thumbnail-holder">
+                  <div class="thumbnail-pic">
+                    <label class="label" (click)="onShowImageViewer()">
+                      <span class="glyphicon glyphicon-camera"></span>
+                      <span>View picture</span>
+                    </label>
+                    <div class="thumbnail-loader" *ngIf="!giftAddOnsThumbnailLoaded">
+                      <mat-spinner></mat-spinner>
+                    </div>
+                    <img [hidden]="!giftAddOnsThumbnailLoaded" [src]="giftAddOns?.thumbnailFile?.url" (error)="pictureErrorHandler($event)" id="thumbnailPicture" width="200" (load)="giftAddOnsThumbnailLoaded = true" alt="picture"/>
+                    <button type="button" *ngIf="giftAddOnForm.enabled" color="primary" class="thumbnail-pic-controls" (click)="onShowChangeThumbnail()" color="primary" mat-mini-fab aria-label="Change thumbnail picture" matTooltip="Change thumbnail picture">
+                      <mat-icon>photo_camera</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div
+                fxFlex="100"
+                fxLayout="column"
+                fxLayout.gt-sm="row"
+                style="gap: 16px">
+                <mat-form-field
+                  appearance="outline"
+                  fxFlex.gt-sm="100%"
+                  fxFlex="100"
+                  class="cell"
+                  [ngClass.gt-sm]="{ isLargeScreen: true }">
+                  <mat-label>Name</mat-label>
+                  <input
+                    matInput
+                    placeholder="Name"
+                    formControlName="name"
+                  />
+                  <mat-error
+                    *ngIf="getError('name')"
+                    >{{
+                      (getError("name") &&
+                      getError("name")["required"]
+                        ? "Please enter name"
+                        : "") ||
+                        (getError("name") &&
+                        getError("name")["pattern"]
+                          ? "Invalid input"
+                          : "") ||
+                        (getError("name") &&
+                        getError("name")["exist"]
+                          ? "Gift Add Ons already exist!"
+                          : "")
+                    }}</mat-error
+                  >
+                </mat-form-field>
+              </div>
+              <div
+                fxFlex="100"
+                fxLayout="column"
+                fxLayout.gt-sm="row"
+                style="gap: 16px">
+                <mat-form-field
+                  appearance="outline"
+                  fxFlex.gt-sm="100%"
+                  fxFlex="100"
+                  class="cell"
+                  [ngClass.gt-sm]="{ isLargeScreen: true }">
+                  <mat-label>Description</mat-label>
+                  <input
+                    matInput
+                    placeholder="Description"
+                    formControlName="description"
+                  />
+                  <mat-error
+                    *ngIf="getError('description')"
+                    >{{
+                      (getError("description") &&
+                      getError("description")["required"]
+                        ? "Please enter description"
+                        : "")
+                    }}</mat-error
+                  >
+                </mat-form-field>
+              </div>
+            </fieldset>
+          </form>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

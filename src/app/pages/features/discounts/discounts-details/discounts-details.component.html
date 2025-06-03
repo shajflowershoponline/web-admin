@@ -1,0 +1,198 @@
+<mat-toolbar color="#fff" class="mat-elevation-z4">
+  <button [disabled]="isLoading" style="margin-right: 10px!important;" mat-icon-button
+    matTooltip="{{ isReadOnly? 'Back' : 'Cancel'}}"
+    [routerLink]="isReadOnly ? '/discounts/' : isNew ? '/discounts/': '/discounts/' + discountId">
+    <mat-icon>
+      {{
+        isReadOnly? 'keyboard_arrow_left' : 'close'
+      }}
+    </mat-icon>
+  </button>
+  <span class="toolbar-item-spacer"></span>
+  <div class="toolbar-action">
+    <button
+      *ngIf="!isNew && isReadOnly"
+      mat-raised-button
+      color="primary"
+      matTooltip="Delete"
+      (click)="onDeleteDiscounts()">
+      Delete
+    </button>
+    <button
+      mat-raised-button
+      color="primary"
+      matTooltip="Edit"
+      *ngIf="!isNew && isReadOnly"
+      routerLink="/discounts/{{discountId}}/edit"
+      replaceUrl="true"
+    >
+      Edit
+    </button>
+    <button
+      *ngIf="!isReadOnly"
+      mat-raised-button
+      color="primary"
+      matTooltip="{{isNew ? 'Save' : 'Update'}}"
+      [disabled]="!formIsReady && !formIsValid"
+      form="discountForm"
+      type="submit">
+      {{isNew ? 'Save' : 'Update'}}
+    </button>
+  </div>
+</mat-toolbar>
+<div class="content">
+  <div class="inner-content">
+    <h4 class="inner-content-title">Discount details</h4>
+    <mat-card>
+      <mat-card-content>
+        <div fxFlex="100" class="content-inner" fxLayout="column">
+          <form
+            [formGroup]="discountForm"
+            fxLayout="row wrap"
+            id="discountForm"
+            (ngSubmit)="onSubmit()"
+            [ngClass]="{'readonly' : isReadOnly}"
+          >
+            <fieldset fxFlex="100" fxLayout="row wrap" style="row-gap: 16px">
+              <div fxFlex="100" fxLayout="column" fxLayout="row ">
+                <div class="thumbnail-holder">
+                  <div class="thumbnail-pic">
+                    <label class="label" (click)="onShowImageViewer()">
+                      <span class="glyphicon glyphicon-camera"></span>
+                      <span>View picture</span>
+                    </label>
+                    <div class="thumbnail-loader" *ngIf="!discountsThumbnailLoaded">
+                      <mat-spinner></mat-spinner>
+                    </div>
+                    <img [hidden]="!discountsThumbnailLoaded" [src]="discounts?.thumbnailFile?.url" (error)="pictureErrorHandler($event)" id="thumbnailPicture" width="200" (load)="discountsThumbnailLoaded = true" alt="picture"/>
+                    <button type="button" *ngIf="discountForm.enabled" color="primary" class="thumbnail-pic-controls" (click)="onShowChangeThumbnail()" color="primary" mat-mini-fab aria-label="Change thumbnail picture" matTooltip="Change thumbnail picture">
+                      <mat-icon>photo_camera</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div
+                fxFlex="100"
+                fxLayout="column"
+                fxLayout.gt-sm="row"
+                style="gap: 16px">
+                <mat-form-field
+                  appearance="outline"
+                  fxFlex.gt-sm="100%"
+                  fxFlex="100"
+                  class="cell"
+                  [ngClass.gt-sm]="{ isLargeScreen: true }">
+                  <mat-label>Promo Code</mat-label>
+                  <input
+                    matInput
+                    placeholder="Promo Code"
+                    formControlName="promoCode"
+                  />
+                  <mat-error
+                    *ngIf="getError('promoCode')"
+                    >{{
+                      (getError("promoCode") &&
+                      getError("promoCode")["required"]
+                        ? "Please enter promo Code"
+                        : "") ||
+                        (getError("promoCode") &&
+                        getError("promoCode")["pattern"]
+                          ? "Invalid input"
+                          : "") ||
+                        (getError("promoCode") &&
+                        getError("promoCode")["exist"]
+                          ? "Discount already exist!"
+                          : "")
+                    }}</mat-error
+                  >
+                </mat-form-field>
+              </div>
+              <div
+                fxFlex="100"
+                fxLayout="column"
+                fxLayout.gt-sm="row"
+                style="gap: 16px">
+                <mat-form-field
+                  appearance="outline"
+                  fxFlex.gt-sm="100%"
+                  fxFlex="100"
+                  class="cell"
+                  [ngClass.gt-sm]="{ isLargeScreen: true }">
+                  <mat-label>Description</mat-label>
+                  <input
+                    matInput
+                    placeholder="Description"
+                    formControlName="description"
+                  />
+                  <mat-error
+                    *ngIf="getError('description')"
+                    >{{
+                      (getError("description") &&
+                      getError("description")["required"]
+                        ? "Please enter description"
+                        : "")
+                    }}</mat-error
+                  >
+                </mat-form-field>
+              </div>
+              <div
+                fxFlex="100"
+                fxLayout="column"
+                fxLayout.gt-xs="row"
+                style="gap: 16px">
+
+                <mat-form-field
+                  appearance="outline"
+                  fxFlex.gt-xs="33.33%"
+                  fxFlex="100"
+                  class="cell">
+                  <mat-label>Type</mat-label>
+                  <mat-select formControlName="type">
+                      <mat-option value="AMOUNT">Amount</mat-option>
+                      <mat-option value="PERCENTAGE">Percentage</mat-option>
+                  </mat-select>
+                  <mat-error
+                    *ngIf="getError('type')"
+                    >{{
+                      (getError("type") &&
+                      getError("type")["required"]
+                        ? "Please enter a type"
+                        : "")
+                    }}</mat-error>
+                </mat-form-field>
+                <mat-form-field
+                  appearance="outline"
+                  fxFlex.gt-xs="33.33%"
+                  fxFlex="100"
+                  class="cell"
+                  [ngClass.gt-sm]="{ isLargeScreen: true }">
+                  <mat-label>Value</mat-label>
+                  <input
+                    matInput
+                    placeholder="Value"
+                    formControlName="value"
+                    type="number"
+                  />
+                  <mat-error
+                    *ngIf="getError('value')"
+                    >{{
+                      (getError("value") &&
+                      getError("value")["required"]
+                        ? "Please enter value"
+                        : "")
+                        ||
+                      (getError("value") &&
+                      getError("value")["min"]
+                        ? "Please enter value atleast 1"
+                        : "")
+                    }}</mat-error
+                  >
+                </mat-form-field>
+              </div>
+            </fieldset>
+          </form>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

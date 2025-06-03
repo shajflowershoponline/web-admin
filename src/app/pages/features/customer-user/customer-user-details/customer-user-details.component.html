@@ -1,0 +1,97 @@
+
+<div class="content">
+  <div class="customer-user-details inner-content">
+    <mat-card>
+      <mat-card-content>
+        <div fxFlex="100" class="content-inner" fxLayout="column">
+          <div
+            fxLayout="row wrap"
+          >
+            <div fxFlex="100" fxLayout="row wrap" style="row-gap: 16px">
+              <!-- <div class="profile-holder">
+                <div class="profile-pic">
+                  <label class="label" (click)="onShowImageViewer()">
+                    <span class="glyphicon glyphicon-camera"></span>
+                    <span>View picture</span>
+                  </label>
+                  <div class="profile-loader" *ngIf="!staffUserProfilePicLoaded">
+                    <mat-spinner></mat-spinner>
+                  </div>
+                  <img [hidden]="!staffUserProfilePicLoaded" [src]="staffUserProfilePicSource" (error)="profilePicErrorHandler($event)" id="profilePicture" width="200" (load)="staffUserProfilePicLoaded = true" alt="profile" />
+                </div>
+                <button type="button" class="profile-pic-controls" (click)="onChangeProfile()" color="primary" mat-mini-fab aria-label="Change profile picture" matTooltip="Change profile picture">
+                  <mat-icon>photo_camera</mat-icon>
+                </button>
+              </div> -->
+              <div
+                fxFlex="100"
+                fxLayout="column"
+                fxLayout.gt-sm="row"
+                style="gap: 16px"
+              >
+                <mat-form-field
+                  appearance="outline"
+                  fxFlex="100"
+                  class="cell"
+                  [ngClass.gt-sm]="{ isLargeScreen: true }"
+                >
+                  <mat-label>Name</mat-label>
+                  <input
+                    matInput
+                    placeholder="Name"
+                    readonly
+                    [ngModel]="customerUser.name"
+                    *ngIf="!isLoading; else templateName"
+                  />
+                  <ng-template #templateName>
+                    <input
+                      matInput
+                      placeholder="Name"
+                    />
+                  </ng-template>
+
+                </mat-form-field>
+              </div>
+              <div
+                fxFlex="100"
+                fxLayout="column"
+                fxLayout.gt-sm="row"
+                style="gap: 16px"
+              >
+                <mat-form-field
+                  appearance="outline"
+                  fxFlex="50%"
+                  class="cell"
+                  [ngClass.gt-sm]="{ isLargeScreen: true }"
+                >
+                  <mat-label>Email</mat-label>
+                  <input
+                    matInput
+                    type="text"
+                    placeholder="Email"
+                    readonly
+                    [ngModel]="customerUser.email"
+                    *ngIf="!isLoading; else templateEmail"
+                  />
+                  <ng-template #templateEmail>
+                    <input
+                      matInput
+                      type="text"
+                      placeholder="Email"
+                    />
+                  </ng-template>
+
+                </mat-form-field>
+                <div
+                appearance="outline"
+                fxFlex="50%"
+                class="cell"
+                [ngClass.gt-sm]="{ isLargeScreen: true }"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

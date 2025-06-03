@@ -1,0 +1,196 @@
+::ng-deep {
+  .hidden {
+    display: none !important;
+  }
+}
+
+
+mat-form-field {
+  mat-spinner {
+    width: 30px !important;
+    height: 30px !important;
+    position: absolute;
+    display: block;
+    top: 15px;
+    right: 0;
+  }
+}
+
+.content {
+  .inner-content {
+    max-width: 100%!important;
+  }
+}
+
+
+
+@mixin object-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+$circleSize: 300px;
+$radius: 10px;
+$fontColor: rgb(250, 250, 250);
+
+.thumbnail-holder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  width: -webkit-fill-available;
+  height: -webkit-fill-available;
+
+  .thumbnail-pic {
+    color: transparent;
+    transition: all .3s ease;
+    @include object-center;
+    position: relative;
+    transition: all .3s ease;
+    box-shadow: 0 0 10px 0 rgb(122 122 122 / 46%);
+    max-width: $circleSize;
+    max-height: $circleSize;
+    border-radius: $radius;
+    overflow: hidden !important;
+    width: -webkit-fill-available;
+    height: -webkit-fill-available;
+
+    .thumbnail-loader {
+      flex-grow: 1;
+      display: flex;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      align-items: center;
+      justify-content: center;
+
+      mat-spinner {
+        width: 40px !important;
+        height: 40px !important;
+      }
+    }
+
+
+    img {
+      width: -webkit-fill-available;
+      height: -webkit-fill-available;
+      position: absolute;
+      z-index: 0;
+      object-position: center;
+      object-fit: contain;
+    }
+
+    .label {
+      cursor: pointer;
+      height: $circleSize;
+      width: $circleSize;
+    }
+
+    &:hover {
+      .label {
+        @include object-center;
+        background-color: rgba(0, 0, 0, .8);
+        z-index: 99;
+        color: $fontColor;
+        transition: background-color .2s ease-in-out;
+        border-radius: $radius;
+        margin-bottom: 0;
+      }
+    }
+
+    span {
+      display: inline-flex;
+      padding: .2em;
+      height: 2em;
+    }
+
+    .thumbnail-pic-controls {
+      position: absolute;
+      z-index: 100;
+      right: 10px;
+      bottom: 10px;
+    }
+  }
+}
+
+
+::ng-deep {
+  .select-item-dialog {
+    padding-left: 16px!important;
+    padding-right: 16px!important;
+    width: 100vw;
+    max-width: 100vw;
+  }
+  .mat-mdc-dialog-content {
+    overflow: hidden;
+    padding-bottom: 0px!important;
+    .select-item-content-holder {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      display: flex;
+      max-height: inherit;
+      box-sizing: border-box;
+      .select-item-content {
+        overflow: auto;
+        padding-bottom: 16px;
+        .select-item-table {
+          min-width: 860px !important;
+          .mat-sort-header {
+              height: 30px;
+              width: max-content;
+              flex-direction: row;
+              display: flex;
+              margin: 10px 0!important;
+          }
+          mat-form-field {
+            width: 100%!important;
+          }
+          .hidden {
+            display: none!important;
+          }
+          .mat-column-selected {
+            flex: 0 0 1% !important;
+            width: 1% !important;
+          }
+        }
+      }
+      .select-item-footer {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        .select-item-selected {
+          padding: 16px!important;
+          margin-top: 20px!important;
+          display: flex;
+          flex-direction: row;
+          .select-item-selected-value {
+            margin-left: 20px!important;
+            h4 {
+              list-style: 1;
+              margin: 0!important;
+            }
+          }
+          .select-item-selected-cancel {
+            max-width: fit-content!important;
+          }
+        }
+      }
+    }
+  }
+
+}
+
+::ng-deep .select-product {
+  .mat-mdc-dialog-content {
+    padding-top: 20px!important;
+  }
+}
+
+
+::ng-deep {
+  .product-collection-card-inner {
+    overflow: auto;
+  }
+}

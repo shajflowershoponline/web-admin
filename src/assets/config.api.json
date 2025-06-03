@@ -1,0 +1,70 @@
+{
+  "apiEndPoints": {
+    "auth": {
+      "login": "/auth/login/staff"
+    },
+    "staffUser": {
+      "getByCode": "/staff-user/",
+      "create": "/staff-user/",
+      "updateProfile": "/staff-user/updateProfile/",
+      "update": "/staff-user/",
+      "getAdvanceSearch": "/staff-user/page/",
+      "delete": "/staff-user/"
+    },
+    "staffAccess": {
+      "getByAdvanceSearch": "/staff-access/page/",
+      "getByCode": "/staff-access/",
+      "create": "/staff-access/",
+      "update": "/staff-access/",
+      "delete": "/staff-access/"
+    },
+    "customerUser": {
+      "getByCode": "/customer-user/",
+      "updateProfile": "/customer-user/updateProfile/",
+      "update": "/customer-user/",
+      "getAdvanceSearch": "/customer-user/page/",
+      "delete": "/customer-user/"
+    },
+    "category": {
+      "getByCode": "/category/",
+      "create": "/category/",
+      "update": "/category/",
+      "updateOrder": "/category/updateOrder/",
+      "getAdvanceSearch": "/category/page/",
+      "delete": "/category/"
+    },
+    "collection": {
+      "getByCode": "/collection/",
+      "create": "/collection/",
+      "update": "/collection/",
+      "updateOrder": "/collection/updateOrder/",
+      "getAdvanceSearch": "/collection/page/",
+      "delete": "/collection/"
+    },
+    "giftAddOns": {
+      "getByCode": "/gift-add-ons/",
+      "create": "/gift-add-ons/",
+      "update": "/gift-add-ons/",
+      "getAdvanceSearch": "/gift-add-ons/page/",
+      "delete": "/gift-add-ons/"
+    },
+    "discounts": {
+      "getByCode": "/discounts/",
+      "create": "/discounts/",
+      "update": "/discounts/",
+      "getAdvanceSearch": "/discounts/page/",
+      "delete": "/discounts/"
+    },
+    "product": {
+      "getByCode": "/product/",
+      "create": "/product/",
+      "update": "/product/",
+      "getAdvanceSearch": "/product/page/",
+      "delete": "/product/"
+    },
+    "notifications": {
+    },
+    "dashboard": {
+    }
+  }
+}

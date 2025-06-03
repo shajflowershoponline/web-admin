@@ -1,0 +1,40 @@
+<div class="page-container container-center container-full">
+  <mat-card>
+    <mat-card-header>
+      <img style="max-width: 150px!important;" src="../../../../assets/img/banner.png" alt="Banner">
+      <h2 style="text-align: center;">{{title}}</h2>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="logInForm" (ngSubmit)="onSubmit()" class="form">
+        <fieldset [disabled]="isProcessing" class="fieldset">
+          <h3 style="margin-bottom: 30px;">Welcome back</h3>
+          <mat-form-field appearance="outline">
+            <mat-label>Enter your Id or Username</mat-label>
+            <input matInput placeholder="Enter your Id or Username" formControlName="userName">
+            <mat-error *ngIf="logInForm.controls['userName']?.errors">{{
+              ( logInForm.controls['userName'].errors['required'] ? 'Enter your Id or Username' : '') ||
+              (logInForm.controls['userName'].errors['not_found'] ? message : '')
+              }}</mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Password</mat-label>
+            <input #password matInput type="password" placeholder="Password" formControlName="password">
+            <mat-icon class="icon-right"
+              (click)="password.type = (password.type === 'password' ? 'text' : 'password')"
+              style="cursor: pointer;" matSuffix>{{ password.type === 'password' ? 'visibility' : 'visibility_off'
+              }}</mat-icon>
+            <mat-error *ngIf="logInForm.controls['password'].errors">{{
+              (logInForm.controls.password.errors && logInForm.controls.password.errors['required'] ? 'Please enter your Password' : '')
+              }}</mat-error>
+          </mat-form-field>
+          <div class="forgot-password">
+            <span>
+              <!-- <a [routerLink]="'/auth/forgot-password'">Forgot password?</a> -->
+            </span>
+          </div>
+          <button mat-raised-button color="primary" type="submit" [disabled]="isProcessing">Login</button>
+        </fieldset>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

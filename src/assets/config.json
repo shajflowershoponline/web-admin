@@ -1,0 +1,72 @@
+{
+  "appName": "Shaj Flower shop Admin",
+  "reservationConfig": {
+    "maxCancellation": "3",
+    "daysCancellationLimitReset": "5",
+    "timeSlotHours": {
+      "start": "08:00",
+      "end": "17:00"
+    }
+  },
+  "sessionConfig": {
+    "sessionTimeout": "60"
+  },
+  "lookup": {
+    "accessPages": [
+      {
+        "page": "Dashboard",
+        "view": false,
+        "modify": false,
+        "rights": []
+      },
+      {
+        "page": "Customer",
+        "view": false,
+        "modify": false,
+        "rights": []
+      },
+      {
+        "page": "Category",
+        "view": false,
+        "modify": false,
+        "rights": []
+      },
+      {
+        "page": "Collection",
+        "view": false,
+        "modify": false,
+        "rights": []
+      },
+      {
+        "page": "Gift Add Ons",
+        "view": true,
+        "modify": true,
+        "rights": []
+      },
+      {
+        "page": "Discounts",
+        "view": true,
+        "modify": true,
+        "rights": []
+      },
+      {
+        "page": "Product",
+        "view": false,
+        "modify": false,
+        "rights": []
+      },
+      {
+        "page": "Staff User",
+        "view": false,
+        "modify": false,
+        "rights": []
+      },
+      {
+        "page": "Staff Access",
+        "view": false,
+        "modify": false,
+        "rights": []
+      }
+    ]
+  }
+}

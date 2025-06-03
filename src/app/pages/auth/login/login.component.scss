@@ -1,0 +1,146 @@
+.page-container {
+  display: flex;
+  flex-direction: column;
+  mat-card {
+    max-width: 500px;
+    width: 100%;
+    box-sizing: border-box;
+    gap: 32px;
+    mat-card-header {
+      align-items: center;
+      justify-content: center;
+      display: flex;
+      flex-direction: column;
+      padding: 32px 32px 0px 32px!important;
+    }
+    mat-card-content {
+      padding: 0px 32px 32px 32px!important;
+      .form {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        box-sizing: border-box;
+        width: 100%;
+        padding: 0!important;
+        margin: 0!important;
+        .fieldset {
+          border: none;
+          width: 100%;
+          min-width: 0 !important;
+          display: flex;
+          flex-direction: column;
+          box-sizing: border-box;
+          row-gap: 10px;
+          padding: 0!important;
+          margin: 0!important;
+          .forgot-password {
+            display: flex;
+            width: 100%;
+            flex-grow: 1;
+            flex-direction: column;
+            align-items: flex-end;
+            row-gap: 10px;
+            margin-bottom: 10px !important;
+          }
+
+          .mdc-button {
+            min-height: 56px;
+            height: 56px;
+          }
+          button {
+            font-size: 1rem!important;
+          }
+        }
+      }
+    }
+  }
+}
+::ng-deep {
+  mat-form-field {
+    margin-bottom: 15px;
+    .mat-mdc-form-field-subscript-wrapper {
+      display: flex;
+      flex-direction: column;
+      &::before {
+        height: 0px!important;
+      }
+      .mat-mdc-form-field-error-wrapper {
+        position: relative !important;
+        padding: 0!important;
+      }
+    }
+  }
+}
+.page-container {
+  display: flex;
+  flex-direction: column;
+  mat-card {
+    max-width: 500px;
+    width: 100%;
+    box-sizing: border-box;
+    gap: 32px;
+    mat-card-header {
+      align-items: center;
+      justify-content: center;
+      display: flex;
+      flex-direction: column;
+      padding: 32px 32px 0px 32px!important;
+    }
+    mat-card-content {
+      padding: 0px 32px 32px 32px!important;
+      .form {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        box-sizing: border-box;
+        width: 100%;
+        padding: 0!important;
+        margin: 0!important;
+        .fieldset {
+          border: none;
+          width: 100%;
+          min-width: 0 !important;
+          display: flex;
+          flex-direction: column;
+          box-sizing: border-box;
+          row-gap: 10px;
+          padding: 0!important;
+          margin: 0!important;
+          .forgot-password {
+            display: flex;
+            width: 100%;
+            flex-grow: 1;
+            flex-direction: column;
+            align-items: flex-end;
+            row-gap: 10px;
+            margin-bottom: 10px !important;
+          }
+
+          .mdc-button {
+            min-height: 56px;
+            height: 56px;
+          }
+          button {
+            font-size: 1rem!important;
+          }
+        }
+      }
+    }
+  }
+}
+::ng-deep {
+  mat-form-field {
+    margin-bottom: 15px;
+    .mat-mdc-form-field-subscript-wrapper {
+      display: flex;
+      flex-direction: column;
+      &::before {
+        height: 0px!important;
+      }
+      .mat-mdc-form-field-error-wrapper {
+        position: relative !important;
+        padding: 0!important;
+      }
+    }
+  }
+}

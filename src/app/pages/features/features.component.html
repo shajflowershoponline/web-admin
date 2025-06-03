@@ -1,0 +1,92 @@
+
+<mat-toolbar color="primary" [ngClass]="{ 'side-bar-open' : drawerDefaultOpened}"
+    [style.boxShadow]="disableToolBarShadow ? 'none!important' : ''">
+    <button mat-icon-button (click)="sidenav.toggle()" matTooltip="Menu" *ngIf="!drawerDefaultOpened">
+        <mat-icon>menu</mat-icon>
+    </button>
+    <img id="banner" src="../assets/img/banner-white.png">
+    <span id="title">{{title}}</span>
+    <span class="toolbar-item-spacer"></span>
+    <button class="profile-mat-menu" mat-icon-button matTooltip="My profile" [matMenuTriggerFor]="userAccountMenu">
+        <mat-icon >account_circle</mat-icon>
+    </button>
+    <mat-menu #userAccountMenu [overlapTrigger]="false" yPosition="below">
+        <button mat-menu-item routerLink="/profile/">
+            <mat-icon>person</mat-icon><span>My profile</span>
+        </button>
+        <mat-divider></mat-divider>
+        <button mat-menu-item (click)="signOut()">
+            <mat-icon>exit_to_app</mat-icon>Logout
+        </button>
+    </mat-menu>
+</mat-toolbar>
+
+<mat-sidenav-container class="app-container" >
+    <mat-sidenav #sidenav mode="side" className="mat-elevation-z4" [opened]="drawerDefaultOpened" [mode]="!drawerDefaultOpened ? 'over': 'side'" style="position: fixed;">
+        <mat-nav-list>
+            <mat-list-item (mouseup)="sidenav.close()" class="mobile-close-sidenav">
+                <mat-icon>keyboard_backspace</mat-icon>
+            </mat-list-item>
+            <mat-list-item routerLink="dashboard" (mouseup)="!drawerDefaultOpened ? sidenav.close() : false" routerLinkActive="active-link">
+                <mat-icon>space_dashboard</mat-icon><span>Dashboard</span>
+            </mat-list-item>
+            <mat-expansion-panel *ngIf="showGroupMenu(['Customer'])" [@.disabled]="disableGroupAnimation" (afterExpand)="disableGroupAnimation = false" [expanded]="expand('Customer Management')" [ngClass]="{'mat-expansion-active':expand('Customer Management') }" [class.mat-elevation-z0]="true" >
+              <mat-expansion-panel-header>
+                <mat-icon>account_circle</mat-icon><span>Customer Management</span>
+              </mat-expansion-panel-header>
+              <mat-nav-list>
+                <mat-list-item *ngIf="showMenu('Customer')" routerLink="customer-user" (mouseup)="!drawerDefaultOpened ? sidenav.close() : false" routerLinkActive="active-link">
+                    <mat-icon>account_circle</mat-icon><span>Customer</span>
+                </mat-list-item>
+              </mat-nav-list>
+            </mat-expansion-panel>
+            <mat-expansion-panel *ngIf="showGroupMenu(['Category', 'Product', 'Collection'])" [@.disabled]="disableGroupAnimation" (afterExpand)="disableGroupAnimation = false" [expanded]="expand('Product Management')" [ngClass]="{'mat-expansion-active':expand('Product Management') }" [class.mat-elevation-z0]="true" >
+              <mat-expansion-panel-header>
+                <mat-icon>local_florist</mat-icon><span>Product Management</span>
+              </mat-expansion-panel-header>
+              <mat-nav-list>
+                <mat-list-item *ngIf="showMenu('Category')" routerLink="category" (mouseup)="!drawerDefaultOpened ? sidenav.close() : false" routerLinkActive="active-link">
+                    <mat-icon>library_books</mat-icon><span>Category</span>
+                </mat-list-item>
+                <mat-list-item *ngIf="showMenu('Product')" routerLink="product" (mouseup)="!drawerDefaultOpened ? sidenav.close() : false" routerLinkActive="active-link">
+                    <mat-icon>local_florist</mat-icon><span>Product</span>
+                </mat-list-item>
+                <mat-list-item *ngIf="showMenu('Collection')" routerLink="collection" (mouseup)="!drawerDefaultOpened ? sidenav.close() : false" routerLinkActive="active-link">
+                    <mat-icon>playlist_add_check</mat-icon><span>Collection</span>
+                </mat-list-item>
+                <mat-list-item *ngIf="showMenu('Gift Add Ons')" routerLink="gift-add-ons" (mouseup)="!drawerDefaultOpened ? sidenav.close() : false" routerLinkActive="active-link">
+                    <mat-icon>redeem</mat-icon><span>Gift Add Ons</span>
+                </mat-list-item>
+                <mat-list-item *ngIf="showMenu('Discounts')" routerLink="discounts" (mouseup)="!drawerDefaultOpened ? sidenav.close() : false" routerLinkActive="active-link">
+                    <mat-icon>sell</mat-icon><span>Discounts</span>
+                </mat-list-item>
+              </mat-nav-list>
+            </mat-expansion-panel>
+            <mat-expansion-panel *ngIf="showGroupMenu(['Staff Access', 'Staff User'])" [@.disabled]="disableGroupAnimation" (afterExpand)="disableGroupAnimation = false" [expanded]="expand('User Management')" [ngClass]="{'mat-expansion-active':expand('User Management') }" [class.mat-elevation-z0]="true" >
+              <mat-expansion-panel-header>
+                <mat-icon>supervised_user_circle</mat-icon><span>User Management</span>
+              </mat-expansion-panel-header>
+              <mat-nav-list>
+                <mat-list-item *ngIf="showMenu('Staff Access')" routerLink="staff-access" (mouseup)="!drawerDefaultOpened ? sidenav.close() : false" routerLinkActive="active-link">
+                    <mat-icon>lock_open</mat-icon><span>Staff Access</span>
+                </mat-list-item>
+                <mat-list-item *ngIf="showMenu('Staff User')" routerLink="staff-user" (mouseup)="!drawerDefaultOpened ? sidenav.close() : false" routerLinkActive="active-link">
+                    <mat-icon>admin_panel_settings</mat-icon><span>Staff User</span>
+                </mat-list-item>
+              </mat-nav-list>
+            </mat-expansion-panel>
+            <!-- <mat-list-item routerLink="settings" *ngIf="showMenu('Settings')" (mouseup)="!drawerDefaultOpened ? sidenav.close() : false" routerLinkActive="active-link">
+                <mat-icon>settings</mat-icon><span>Settings</span>
+            </mat-list-item> -->
+        </mat-nav-list>
+    </mat-sidenav>
+    <mat-sidenav-content>
+        <div class="page-wrapper">
+            <div class="page-container" [ngClass]="{ 'details-container': details }">
+                <router-outlet (activate)="onActivate($event)">
+                </router-outlet>
+            </div>
+          </div>
+    </mat-sidenav-content>
+</mat-sidenav-container>
+<app-notification-window #notification (readNotif)="getNotifCount()"></app-notification-window>

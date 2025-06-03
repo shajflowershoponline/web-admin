@@ -1,0 +1,363 @@
+<mat-toolbar color="#fff" class="mat-elevation-z4">
+  <button [disabled]="isLoading" style="margin-right: 10px!important;" mat-icon-button
+    matTooltip="{{ isReadOnly? 'Back' : 'Cancel'}}"
+    [routerLink]="isReadOnly ? '/collection/' : isNew ? '/collection/': '/collection/' + collectionId">
+    <mat-icon>
+      {{
+      isReadOnly? 'keyboard_arrow_left' : 'close'
+      }}
+    </mat-icon>
+  </button>
+  <!-- <span id="title" >
+    <span [ngStyle.md]="{ 'display': 'none'}" [ngStyle.sm]="{ 'display': 'none'}" [ngStyle.xs]="{ 'display': 'none'}">
+      {{ isNew ? 'New collection' : '#' + collectionId + ' ' + ( !isLoading ? collection?.name : '')}}
+    </span>
+  </span> -->
+  <span class="toolbar-item-spacer"></span>
+  <div class="toolbar-action">
+    <button *ngIf="!isNew && isReadOnly" mat-raised-button color="primary" matTooltip="Delete"
+      (click)="onDeleteCollection()">
+      Delete
+    </button>
+    <button mat-raised-button color="primary" matTooltip="Edit" *ngIf="!isNew && isReadOnly"
+      routerLink="/collection/{{collectionId}}/edit" replaceUrl="true">
+      Edit
+    </button>
+    <button *ngIf="!isReadOnly" mat-raised-button color="primary" matTooltip="{{isNew ? 'Save' : 'Update'}}"
+      [disabled]="!formIsReady && !formIsValid" form="collectionForm" type="submit">
+      {{isNew ? 'Save' : 'Update'}}
+    </button>
+  </div>
+</mat-toolbar>
+<div class="content">
+  <div class="inner-content">
+    <!-- <h4 class="inner-content-title">Collection details</h4> -->
+    <div fxLayout="column" fxFlex="100" fxLayout.gt-sm="row" fxLayoutGap="16"
+      [fxLayoutAlign.gt-sm]="isReadOnly ? '' : 'center'">
+      <div fxFlex="100" fxFlex.gt-sm="30" fxLayout="column">
+        <h4 class="inner-content-title">Collection details</h4>
+        <mat-card>
+          <mat-card-content>
+            <div fxFlex="100" class="content-inner" fxLayout="column">
+              <form [formGroup]="collectionForm" fxLayout="row wrap" id="collectionForm" (ngSubmit)="onSubmit()"
+                [ngClass]="{'readonly' : isReadOnly}">
+                <fieldset fxFlex="100" fxLayout="row wrap" style="row-gap: 16px">
+                  <div fxFlex="100" fxLayout="column" fxLayout="row ">
+                    <div class="thumbnail-holder">
+                      <div class="thumbnail-pic">
+                        <label class="label" (click)="onShowImageViewer()">
+                          <span class="glyphicon glyphicon-camera"></span>
+                          <span>View picture</span>
+                        </label>
+                        <div class="thumbnail-loader" *ngIf="!collectionThumbnailLoaded">
+                          <mat-spinner></mat-spinner>
+                        </div>
+                        <img [hidden]="!collectionThumbnailLoaded" [src]="collection?.thumbnailFile?.url"
+                          (error)="pictureErrorHandler($event)" id="thumbnailPicture" width="200"
+                          (load)="collectionThumbnailLoaded = true" alt="picture" />
+                        <button type="button" *ngIf="collectionForm.enabled" color="primary"
+                          class="thumbnail-pic-controls" (click)="onShowChangeThumbnail()" color="primary" mat-mini-fab
+                          aria-label="Change thumbnail picture" matTooltip="Change thumbnail picture">
+                          <mat-icon>photo_camera</mat-icon>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div fxFlex="100" fxLayout="column" fxLayout.gt-sm="row" style="gap: 16px">
+                    <mat-form-field appearance="outline" fxFlex.gt-md="50%" fxFlex="100" class="cell"
+                      [ngClass.gt-sm]="{ isLargeScreen: true }">
+                      <mat-label>Sequence number</mat-label>
+                      <input matInput type="number" placeholder="Sequence number" formControlName="sequenceId" />
+                      <mat-error *ngIf="getError('sequenceId')">{{
+                        (getError("sequenceId") &&
+                        getError("sequenceId")["required"]
+                        ? "Please enter sequence number"
+                        : "") ||
+                        (getError("sequenceId") &&
+                        getError("sequenceId")["pattern"]
+                        ? "Invalid sequence number"
+                        : "") ||
+                        (getError("sequenceId") &&
+                        getError("sequenceId")["exist"]
+                        ? "Sequence number already exist"
+                        : "")
+                        }}</mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div fxFlex="100" fxLayout="column" fxLayout.gt-sm="row" style="gap: 16px">
+                    <mat-form-field appearance="outline" fxFlex.gt-sm="100%" fxFlex="100" class="cell"
+                      [ngClass.gt-sm]="{ isLargeScreen: true }">
+                      <mat-label>Name</mat-label>
+                      <input matInput placeholder="Name" formControlName="name" />
+                      <mat-error *ngIf="getError('name')">{{
+                        (getError("name") &&
+                        getError("name")["required"]
+                        ? "Please enter name"
+                        : "") ||
+                        (getError("name") &&
+                        getError("name")["pattern"]
+                        ? "Invalid input"
+                        : "") ||
+                        (getError("name") &&
+                        getError("name")["exist"]
+                        ? "Collection already exist!"
+                        : "")
+                        }}</mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div fxFlex="100" fxLayout="column" fxLayout.gt-sm="row" style="gap: 16px">
+                    <mat-form-field appearance="outline" fxFlex.gt-sm="100%" fxFlex="100" class="cell"
+                      [ngClass.gt-sm]="{ isLargeScreen: true }">
+                      <mat-label>Description</mat-label>
+                      <input matInput placeholder="Description" formControlName="desc" />
+                      <mat-error *ngIf="getError('desc')">{{
+                        (getError("desc") &&
+                        getError("desc")["required"]
+                        ? "Please enter desc"
+                        : "")
+                        }}</mat-error>
+                    </mat-form-field>
+                  </div>
+
+                  <mat-slide-toggle *ngIf="!isReadOnly; else onSale" formControlName="isSale">
+                    On Sale
+                  </mat-slide-toggle>
+                  <ng-template #onSale>
+                    <ng-container *ngIf="collectionForm.controls['isSale'].value">
+                      <div fxLayout="column">
+                        <p>On Sale</p>
+                        <p fxLayout="column">
+                          <span>From: <strong>{{collectionForm.controls['saleFromDate'].value | date: 'MMM dd, yyyy'}}</strong></span>
+                          <span>Until: <strong>{{collectionForm.controls['saleDueDate'].value | date: 'MMM dd, yyyy'}}</strong></span>
+                        </p>
+                      </div>
+                    </ng-container>
+                  </ng-template>
+
+                  <br>
+                  <br>
+
+                  <div fxFlex="100" fxLayout="column" fxLayout.gt-xs="row" fxLayoutGap.gt-xs="16" *ngIf="!isReadOnly">
+
+                    <!-- Sale From Date -->
+                    <div fxFlex="50" fxLayout="column">
+                      <mat-form-field appearance="outline">
+                        <mat-label>Sale From Date</mat-label>
+                        <input matInput [matDatepicker]="saleFromDatePicker" formControlName="saleFromDate"
+                          [max]="collectionForm.controls['saleFromDate'].value">
+                        <mat-datepicker-toggle matSuffix [for]="saleFromDatePicker"></mat-datepicker-toggle>
+                        <mat-datepicker #saleFromDatePicker></mat-datepicker>
+                      </mat-form-field>
+                      <mat-error *ngIf="getError('saleFromDate')">
+                        {{ getError("saleFromDate")?.required ? "Start date is required" : "" }}
+                      </mat-error>
+                    </div>
+                    <div fxFlex="50" fxLayout="column">
+                      <!-- Sale Due Date -->
+                      <mat-form-field appearance="outline">
+                        <mat-label>Sale Due Date</mat-label>
+                        <input matInput [matDatepicker]="saleDueDatePicker" formControlName="saleDueDate"
+                          [min]="collectionForm.controls['saleDueDate'].value">
+                        <mat-datepicker-toggle matSuffix [for]="saleDueDatePicker"></mat-datepicker-toggle>
+                        <mat-datepicker #saleDueDatePicker></mat-datepicker>
+                      </mat-form-field>
+                      <mat-error *ngIf="getError('saleDueDate')">
+                        {{ getError("saleDueDate")?.required ? "End date is required" : "" }}
+                      </mat-error>
+                    </div>
+                  </div>
+                </fieldset>
+              </form>
+
+              <br>
+              <br>
+
+              <div fxFlex="100" fxLayout="column" *ngIf="collectionForm.controls['isSale'].value">
+                <div fxFlex="100" fxLayout="column" [ngClass]="{'readonly' : isReadOnly}" *ngIf="!isReadOnly">
+                  <mat-form-field class="full-width" appearance="outline">
+                    <mat-label>Discounts</mat-label>
+                    <input type="text" matInput placeholder="Search discounts" [formControl]="searchDiscountsCtrl"
+                      [matAutocomplete]="autoCompleteDiscounts">
+                  </mat-form-field>
+
+                  <mat-autocomplete #autoCompleteDiscounts="matAutocomplete">
+                    <mat-option *ngFor="let option of filteredDiscountsOptions$ | async"
+                      (click)="toggleMultiSelection(option, 'discounts')">
+                      <mat-checkbox [checked]="isSelectedMultiSelect(option)">
+                        {{ option.promoCode }}
+                      </mat-checkbox>
+                    </mat-option>
+                  </mat-autocomplete>
+
+                </div>
+
+                <div *ngIf="collectionForm.controls['selectedDiscounts'].value.length > 0; else discountsPlaceHolder" fxFlex="100"
+                  fxLayout="column" class="selected-list">
+                  <span *ngIf="isReadOnly">Discounts</span>
+                  <mat-chip-listbox>
+                    <mat-chip *ngFor="let option of collectionForm.controls['selectedDiscounts'].value" removable
+                      (removed)="toggleMultiSelection(option, 'discounts')">
+                      {{ option.promoCode }}
+                      <mat-icon matChipRemove *ngIf="!isReadOnly">cancel</mat-icon>
+                    </mat-chip>
+                  </mat-chip-listbox>
+                </div>
+
+                <ng-template #discountsPlaceHolder>
+                  <div class="empty-placeholder" fxLayout="column" fxLayoutAlign="center center" style="height: 300px;">
+                    <mat-icon
+                      style="font-size: 3rem; color: #ccc;width: 40px;height: 40px;">playlist_add_check</mat-icon>
+                    <p style="color: #888;">No discounts added.</p>
+                  </div>
+                </ng-template>
+
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+      <div fxFlex="100" fxFlex.gt-sm="70" fxLayout="column">
+        <h4 class="inner-content-title">Products</h4>
+        <div class="component-floating-actions vertical-actions" *ngIf="!isReadOnly">
+          <button mat-fab color="primary" aria-label="Add product" matTooltip="Add product"
+            (click)="openSelectProductDialog()">
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
+        <div fxFlex="100" fxLayout="column">
+          <div fxFlex="100" fxLayout="column" class="product-collection-card-inner"
+            *ngIf="productCollectionDataSource.data.length > 0; else noProductCollection">
+            <table class="table-request-inventoryRequestItems" mat-table [dataSource]="productCollectionDataSource">
+              <!-- Page Column -->
+              <ng-container matColumnDef="sku" [sticky]="true">
+                <th mat-header-cell *matHeaderCellDef [ngStyle]="{ 'width': '50%', 'min-width': '100px'}">sku</th>
+                <td mat-cell *matCellDef="let element">{{ element.sku }}</td>
+              </ng-container>
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef [ngStyle]="{ 'width': '30%'}">Product name</th>
+                <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+              </ng-container>
+              <ng-container matColumnDef="category">
+                <th mat-header-cell *matHeaderCellDef [ngStyle]="{ 'width': '20%'}">Product Category</th>
+                <td mat-cell *matCellDef="let element">{{element.category }}</td>
+              </ng-container>
+              <ng-container matColumnDef="controls">
+                <th mat-header-cell *matHeaderCellDef> </th>
+                <td mat-cell *matCellDef="let element">
+                  <button matTooltip="More" mat-icon-button [matMenuTriggerFor]="menu" [disabled]="isReadOnly"
+                    *ngIf="!isReadOnly">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                  <mat-menu #menu="matMenu" xPosition="before">
+                    <button mat-menu-item (click)="editProductCollectionItem(element)">Edit</button>
+                    <button mat-menu-item (click)="deleteProductCollectionItem(element)">Delete</button>
+                  </mat-menu>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="productCollectionDisplayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: productCollectionDisplayedColumns"></tr>
+            </table>
+          </div>
+        </div>
+        <ng-template #noProductCollection>
+          <div class="empty-placeholder" fxLayout="column" fxLayoutAlign="center center" style="height: 300px;">
+            <mat-icon style="font-size: 3rem; color: #ccc;width: 40px;height: 40px;">playlist_add_check</mat-icon>
+            <p style="color: #888;">No product collection added.</p>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<ng-template #selectProductDialog>
+
+  <h4 mat-dialog-title>Search Product</h4>
+  <div mat-dialog-content>
+    <div class="select-item-content-holder">
+      <div fxFlex="100" fxLayout="column" class="select-item-content">
+        <table class="select-item-table" mat-table matSort [dataSource]="productDataSource">
+          <!-- Page Column -->
+          <ng-container matColumnDef="selected">
+            <th mat-header-cell *matHeaderCellDef [ngStyle]="{ 'width': '5%', 'min-width': '0px!important'}"></th>
+            <td mat-cell *matCellDef="let element">
+              <div style="height: 76px!important;
+              display: flex;
+              align-items: center;">
+                <mat-checkbox #selected [checked]="isSelected(element)"
+                  (change)="selectionChange(element, selected.checked)"></mat-checkbox>
+              </div>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="sku">
+            <th mat-header-cell *matHeaderCellDef [ngStyle]="{ 'width': '30%', 'min-width': '100px'}">
+              <span mat-sort-header>SKU</span>
+              <mat-form-field floatLabel="never" appearance="outline">
+                <input matInput placeholder="Search sku" [(ngModel)]="filterSKU" (keyup.enter)="init()" />
+              </mat-form-field>
+            </th>
+            <td mat-cell *matCellDef="let element">{{ element.sku }}</td>
+          </ng-container>
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef [ngStyle]="{ 'width': '30%', 'min-width': '100px'}">
+              <span mat-sort-header>Product name</span>
+              <mat-form-field floatLabel="never" appearance="outline">
+                <input matInput placeholder="Search product name" [(ngModel)]="filterProductName"
+                  (keyup.enter)="init()" />
+              </mat-form-field>
+            </th>
+            <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+          </ng-container>
+          <ng-container matColumnDef="category">
+            <th mat-header-cell *matHeaderCellDef [ngStyle]="{ 'width': '30%', 'min-width': '100px'}">
+              <span mat-sort-header>Product Category</span>
+              <mat-form-field floatLabel="never" appearance="outline">
+                <input matInput placeholder="Search product category" [(ngModel)]="filterProductCategory"
+                  (keyup.enter)="init()" />
+              </mat-form-field>
+            </th>
+            <td mat-cell *matCellDef="let element">{{ element.category }}</td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="productDisplayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: productDisplayedColumns"></tr>
+        </table>
+      </div>
+      <div class="select-item-footer">
+        <div fxFlex="100" *ngIf="selected && selected?.itemId" class="select-item-selected">
+          <div fxFlex="100" fxLayout="column" class="select-item-selected-cancel">
+            <button mat-icon-button aria-label="Unselect" (click)="selectionChange(selected, false)">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+          <div fxFlex="100" fxLayout="column" class="select-item-selected-value">
+            <h4>{{selected?.itemName}}</h4><br>
+            <h4>{{selected?.itemCategory}}</h4>
+          </div>
+        </div>
+        <div fxFlex="100">
+          <mat-paginator [style]="{'display': productDataSource.data.length === 0 ? 'none!important' : ''}"
+            #productPaginator [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons [length]="total">
+          </mat-paginator>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div mat-dialog-actions>
+    <div>
+      <button mat-flat-button cdkFocusInitial mat-dialog-close>
+        Cancel
+      </button>
+      <button mat-flat-button color="primary" type="submit" (click)="doneProductSelection()"
+        [disabled]="!selectedProduct || !selectedProduct?.productId || selectedProduct?.productId === ''">
+        Select
+      </button>
+    </div>
+  </div>
+
+
+</ng-template>

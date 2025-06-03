@@ -1,0 +1,186 @@
+<mat-toolbar color="#fff" class="mat-elevation-z4">
+  <button [disabled]="isLoading" style="margin-right: 10px!important;" mat-icon-button
+    matTooltip="{{ isReadOnly? 'Back' : 'Cancel'}}"
+    [routerLink]="isReadOnly ? '/category/' : isNew ? '/category/': '/category/' + categoryId">
+    <mat-icon>
+      {{
+        isReadOnly? 'keyboard_arrow_left' : 'close'
+      }}
+    </mat-icon>
+  </button>
+  <!-- <span id="title" >
+    <span [ngStyle.md]="{ 'display': 'none'}" [ngStyle.sm]="{ 'display': 'none'}" [ngStyle.xs]="{ 'display': 'none'}">
+      {{ isNew ? 'New category' : '#' + categoryId + ' ' + ( !isLoading ? category?.name : '')}}
+    </span>
+  </span> -->
+  <span class="toolbar-item-spacer"></span>
+  <div class="toolbar-action">
+    <button
+      *ngIf="!isNew && isReadOnly"
+      mat-raised-button
+      color="primary"
+      matTooltip="Delete"
+      (click)="onDeleteCategory()">
+      Delete
+    </button>
+    <button
+      mat-raised-button
+      color="primary"
+      matTooltip="Edit"
+      *ngIf="!isNew && isReadOnly"
+      routerLink="/category/{{categoryId}}/edit"
+      replaceUrl="true"
+    >
+      Edit
+    </button>
+    <button
+      *ngIf="!isReadOnly"
+      mat-raised-button
+      color="primary"
+      matTooltip="{{isNew ? 'Save' : 'Update'}}"
+      [disabled]="!formIsReady && !formIsValid"
+      form="categoryForm"
+      type="submit">
+      {{isNew ? 'Save' : 'Update'}}
+    </button>
+  </div>
+</mat-toolbar>
+<div class="content">
+  <div class="inner-content">
+    <h4 class="inner-content-title">Category details</h4>
+    <mat-card>
+      <mat-card-content>
+        <div fxFlex="100" class="content-inner" fxLayout="column">
+          <form
+            [formGroup]="categoryForm"
+            fxLayout="row wrap"
+            id="categoryForm"
+            (ngSubmit)="onSubmit()"
+            [ngClass]="{'readonly' : isReadOnly}"
+          >
+            <fieldset fxFlex="100" fxLayout="row wrap" style="row-gap: 16px">
+              <div fxFlex="100" fxLayout="column" fxLayout="row ">
+                <div class="thumbnail-holder">
+                  <div class="thumbnail-pic">
+                    <label class="label" (click)="onShowImageViewer()">
+                      <span class="glyphicon glyphicon-camera"></span>
+                      <span>View picture</span>
+                    </label>
+                    <div class="thumbnail-loader" *ngIf="!categoryThumbnailLoaded">
+                      <mat-spinner></mat-spinner>
+                    </div>
+                    <img [hidden]="!categoryThumbnailLoaded" [src]="category?.thumbnailFile?.url" (error)="pictureErrorHandler($event)" id="thumbnailPicture" width="200" (load)="categoryThumbnailLoaded = true" alt="picture"/>
+                    <button type="button" *ngIf="categoryForm.enabled" color="primary" class="thumbnail-pic-controls" (click)="onShowChangeThumbnail()" color="primary" mat-mini-fab aria-label="Change thumbnail picture" matTooltip="Change thumbnail picture">
+                      <mat-icon>photo_camera</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div
+                fxFlex="100"
+                fxLayout="column"
+                fxLayout.gt-sm="row"
+                style="gap: 16px">
+                <mat-form-field
+                  appearance="outline"
+                  fxFlex.gt-sm="33.33%"
+                  fxFlex="100"
+                  class="cell"
+                  [ngClass.gt-sm]="{ isLargeScreen: true }">
+                  <mat-label>Sequence number</mat-label>
+                  <input
+                    matInput
+                    type="number"
+                    placeholder="Sequence number"
+                    formControlName="sequenceId"
+                  />
+                  <mat-error
+                    *ngIf="getError('sequenceId')"
+                    >{{
+                      (getError("sequenceId") &&
+                      getError("sequenceId")["required"]
+                        ? "Please enter sequence number"
+                        : "") ||
+                        (getError("sequenceId") &&
+                        getError("sequenceId")["pattern"]
+                          ? "Invalid sequence number"
+                          : "") ||
+                        (getError("sequenceId") &&
+                        getError("sequenceId")["exist"]
+                          ? "Sequence number already exist"
+                          : "")
+                    }}</mat-error
+                  >
+                </mat-form-field>
+              </div>
+              <div
+                fxFlex="100"
+                fxLayout="column"
+                fxLayout.gt-sm="row"
+                style="gap: 16px">
+                <mat-form-field
+                  appearance="outline"
+                  fxFlex.gt-sm="100%"
+                  fxFlex="100"
+                  class="cell"
+                  [ngClass.gt-sm]="{ isLargeScreen: true }">
+                  <mat-label>Name</mat-label>
+                  <input
+                    matInput
+                    placeholder="Name"
+                    formControlName="name"
+                  />
+                  <mat-error
+                    *ngIf="getError('name')"
+                    >{{
+                      (getError("name") &&
+                      getError("name")["required"]
+                        ? "Please enter name"
+                        : "") ||
+                        (getError("name") &&
+                        getError("name")["pattern"]
+                          ? "Invalid input"
+                          : "") ||
+                        (getError("name") &&
+                        getError("name")["exist"]
+                          ? "Category already exist!"
+                          : "")
+                    }}</mat-error
+                  >
+                </mat-form-field>
+              </div>
+              <div
+                fxFlex="100"
+                fxLayout="column"
+                fxLayout.gt-sm="row"
+                style="gap: 16px">
+                <mat-form-field
+                  appearance="outline"
+                  fxFlex.gt-sm="100%"
+                  fxFlex="100"
+                  class="cell"
+                  [ngClass.gt-sm]="{ isLargeScreen: true }">
+                  <mat-label>Description</mat-label>
+                  <input
+                    matInput
+                    placeholder="Description"
+                    formControlName="desc"
+                  />
+                  <mat-error
+                    *ngIf="getError('desc')"
+                    >{{
+                      (getError("desc") &&
+                      getError("desc")["required"]
+                        ? "Please enter a description"
+                        : "")
+                    }}</mat-error
+                  >
+                </mat-form-field>
+              </div>
+            </fieldset>
+          </form>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
