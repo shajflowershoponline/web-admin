@@ -57,6 +57,14 @@ export class CollectionService implements IServices {
     );
   }
 
+  updateFeatured(id: string, data: any): Observable<ApiResponse<Collection>> {
+    return this.http.put<any>(environment.apiBaseUrl + this.appconfig.config.apiEndPoints.collection.updateFeatured + id, data)
+    .pipe(
+      tap(_ => this.log('collection')),
+      catchError(this.handleError('collection', []))
+    );
+  }
+
   updateOrder(data: any[]): Observable<ApiResponse<Collection>> {
     return this.http.put<any>(environment.apiBaseUrl + this.appconfig.config.apiEndPoints.collection.updateOrder, data)
     .pipe(

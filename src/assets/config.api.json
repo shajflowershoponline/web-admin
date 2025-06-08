@@ -37,6 +37,7 @@
       "getByCode": "/collection/",
       "create": "/collection/",
       "update": "/collection/",
+      "updateFeatured": "/collection/updateFeatured/",
       "updateOrder": "/collection/updateOrder/",
       "getAdvanceSearch": "/collection/page/",
       "delete": "/collection/"
@@ -62,9 +63,22 @@
       "getAdvanceSearch": "/product/page/",
       "delete": "/product/"
     },
+    "order": {
+      "getByCode": "/order/",
+      "updateStatus": "/order/updateStatus/",
+      "getAdvanceSearch": "/order/page/"
+    },
+    "settings": {
+      "getAll": "/system-config/",
+      "find": "/system-config/",
+      "save": "/system-config/"
+    },
     "notifications": {
     },
     "dashboard": {
+    },
+    "geolocation": {
+      "searchAddress": "/geolocation/search/"
     }
   }
 }

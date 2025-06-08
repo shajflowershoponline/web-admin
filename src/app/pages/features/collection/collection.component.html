@@ -43,6 +43,15 @@
                 <ng-container *ngIf="item.isSale">
                   <span>{{item.saleFromDate | date: 'MMM dd, yyyy'}} - {{item.saleDueDate | date: 'MMM dd, yyyy'}}</span>
                 </ng-container>
+                  <div *ngIf="item.isFeatured" style="display: flex;flex-direction: row;gap: 5px;margin-top: 10px;" (click)="onToggleFeatured(item)">
+                    <mat-icon style="
+                    width: fit-content;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;color: #00C853!important" >check_circle</mat-icon>
+                    <span style="width: fit-content;">Collection is currently featured</span>
+                  </div>
               </mat-card-content>
               <mat-card-actions>
                 <button color="accent" routerLink="/collection/{{item.collectionId}}" mat-button>View Details</button>

@@ -20,6 +20,12 @@
         "rights": []
       },
       {
+        "page": "Orders",
+        "view": false,
+        "modify": false,
+        "rights": []
+      },
+      {
         "page": "Customer",
         "view": false,
         "modify": false,
@@ -63,6 +69,12 @@
       },
       {
         "page": "Staff Access",
+        "view": false,
+        "modify": false,
+        "rights": []
+      },
+      {
+        "page": "System Config",
         "view": false,
         "modify": false,
         "rights": []

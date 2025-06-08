@@ -30,6 +30,9 @@
             <mat-list-item routerLink="dashboard" (mouseup)="!drawerDefaultOpened ? sidenav.close() : false" routerLinkActive="active-link">
                 <mat-icon>space_dashboard</mat-icon><span>Dashboard</span>
             </mat-list-item>
+            <mat-list-item *ngIf="showMenu('Orders')" routerLink="orders" (mouseup)="!drawerDefaultOpened ? sidenav.close() : false" routerLinkActive="active-link">
+                <mat-icon>shopping_cart</mat-icon><span>Orders</span>
+            </mat-list-item>
             <mat-expansion-panel *ngIf="showGroupMenu(['Customer'])" [@.disabled]="disableGroupAnimation" (afterExpand)="disableGroupAnimation = false" [expanded]="expand('Customer Management')" [ngClass]="{'mat-expansion-active':expand('Customer Management') }" [class.mat-elevation-z0]="true" >
               <mat-expansion-panel-header>
                 <mat-icon>account_circle</mat-icon><span>Customer Management</span>
@@ -75,6 +78,9 @@
                 </mat-list-item>
               </mat-nav-list>
             </mat-expansion-panel>
+            <mat-list-item *ngIf="showMenu('System Config')" routerLink="system-config" (mouseup)="!drawerDefaultOpened ? sidenav.close() : false" routerLinkActive="active-link">
+                <mat-icon>settings</mat-icon><span>System Config</span>
+            </mat-list-item>
             <!-- <mat-list-item routerLink="settings" *ngIf="showMenu('Settings')" (mouseup)="!drawerDefaultOpened ? sidenav.close() : false" routerLinkActive="active-link">
                 <mat-icon>settings</mat-icon><span>Settings</span>
             </mat-list-item> -->

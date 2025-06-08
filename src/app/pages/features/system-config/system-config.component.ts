@@ -1,0 +1,296 @@
+import { Component, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { DomSanitizer } from '@angular/platform-browser';
+import { Router } from '@angular/router';
+import { catchError, debounceTime, map, of, Subject, switchMap } from 'rxjs';
+import { SystemConfig } from 'src/app/models/system-config';
+import { AppConfigService } from 'src/app/services/app-config.service';
+import { GeoLocationService } from 'src/app/services/geo-location.service';
+import { StorageService } from 'src/app/services/storage.service';
+import { SystemConfigService } from 'src/app/services/system-config.service';
+import { LocationMapViewerComponent } from 'src/app/shared/location-map-viewer/location-map-viewer.component';
+import { environment } from 'src/environments/environment';
+
+export class SystemConfigView {
+  key: string;
+  value: any;
+  title?: string;
+  edit?: boolean;
+  canEdit?: boolean;
+  sequence?: number;
+  dirty?: boolean;
+  valid?: boolean;
+};
+
+@Component({
+  selector: 'app-system-config',
+  templateUrl: './system-config.component.html',
+  styleUrl: './system-config.component.scss',
+  host: {
+    class: "page-component"
+  }
+})
+export class SystemConfigComponent {
+  private searchSubject = new Subject<string>();
+  locationOptions: any[] = [];
+  selectedCoords = { lat: 0, lng: 0 };
+  systemConfigs: SystemConfigView[] = [];
+  originalConfigs: SystemConfigView[] = [];
+  isLoading = false;
+  error;
+  @ViewChild('locationMapViewer') locationMapViewer!: LocationMapViewerComponent;
+
+  constructor(private systemConfigService: SystemConfigService,
+    private geoLocationService: GeoLocationService,
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog,
+    public appConfig: AppConfigService,
+    private storageService: StorageService,
+    private readonly sanitizer: DomSanitizer,
+    public router: Router) {
+
+  }
+
+  get prod() {
+    return environment.production;
+  }
+
+  ngOnInit(): void {
+    //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
+    //Add 'implements OnInit' to the class.
+    this.loadSettings();
+    this.searchSubject.pipe(
+      debounceTime(500),
+      switchMap(text => this.geocodeAddress(text))
+    ).subscribe(results => this.locationOptions = results);
+
+  }
+
+  loadSettings() {
+    try {
+      this.systemConfigService.getAll().subscribe(res => {
+        if (res.success) {
+          const items = res.data.map((x: {
+            index: number;
+            key: string;
+            value: string;
+          }) => {
+            let { key, value } = x;
+            let title = x.key;
+            let show = true;
+            let sequence = 0;
+            let canEdit = true;
+            if (x.key === "DELIVERY_RATE") {
+              title = "(₱)Delivery Rate by KM ";
+              sequence = 0;
+            } else if (x.key === "STORE_LOCATION_NAME") {
+              title = "Location Address";
+              sequence = 1;
+            } else if (x.key === "STORE_LOCATION_COORDINATES") {
+              title = "Location Address Map";
+              value = value.split(", ") as any;
+              show = false;
+              this.selectedCoords = { lat: parseFloat(value[0]), lng: parseFloat(value[1]) };
+              sequence = 2;
+              canEdit = false;
+            } else if (x.key === "SOCIAL_FACEBOOK_LINK") {
+              title = "Facebook link";
+              sequence = 3;
+            } else if (x.key === "CLIENT_SITE_SLIDES_CONTENTS") {
+              title = "Client Site: Slides contents";
+              sequence = 4;
+              value = JSON.parse(value);
+              console.log(key, value);
+            } else if (x.key === "CLIENT_SITE_HISTORY_CONTENTS") {
+              title = "Client Site: History Content";
+              sequence = 5;
+              value = JSON.parse(value);
+            } else if (x.key === "CLIENT_SITE_FOOTER_BANNER_CONTENT") {
+              title = "Client Site: Footer Banner content";
+              sequence = 6;
+              value = JSON.parse(value);
+            } else if (x.key === "STORE_SUPPORT_EMAIL") {
+              title = "Store Support Email";
+              sequence = 7;
+            } else if (x.key === "STORE_MOBILE_NUMBER") {
+              title = "Store Mobile Number";
+              sequence = 8;
+            } else if (x.key === "MAXIM_LOCATION_SERVICE_URL") {
+              title = "Maxim Location Service API URL";
+              show = false;
+              sequence = 9;
+            } else if (x.key === "MAXIM_LOCATION_SERVICE_API_KEY") {
+              title = "Maxim Location Service API Key";
+              show = false;
+              sequence = 10;
+            }
+            return {
+              title,
+              show,
+              key,
+              value,
+              sequence,
+              edit: false,
+              canEdit
+            };
+          }).filter(x =>
+            x.show
+          ).sort((a, b) => {
+            return Number(a.sequence) - Number(b.sequence);
+          });
+
+          for (let item of items) {
+            this.originalConfigs.push(JSON.parse(JSON.stringify(item)));
+            this.systemConfigs.push(JSON.parse(JSON.stringify(item)));
+          }
+          this.isLoading = false;
+        } else {
+          this.error = Array.isArray(res.message) ? res.message[0] : res?.message;
+          this.snackBar.open(this.error, 'close', { panelClass: ['style-error'] });
+          this.isLoading = false;
+        }
+      }, (err) => {
+        this.error = Array.isArray(err.message) ? err.message[0] : err?.message ? err?.message : err;
+        this.snackBar.open(this.error, 'close', { panelClass: ['style-error'] });
+        this.isLoading = false;
+      })
+    } catch (ex) {
+      this.error = Array.isArray(ex.message) ? ex.message[0] : ex?.message ? ex?.message : ex;
+      this.snackBar.open(this.error, 'close', { panelClass: ['style-error'] });
+      this.isLoading = false;
+    }
+  }
+
+  onSaveSettings(setting: SystemConfig) {
+    if (!setting) {
+      return;
+    }
+    try {
+
+      this.systemConfigService.save(setting).subscribe(res => {
+        if (res.success) {
+          if (setting.key === "STORE_LOCATION_NAME") {
+            this.onSaveSettings({
+              key: "STORE_LOCATION_COORDINATES",
+              value: `${this.selectedCoords.lat}, ${this.selectedCoords.lng}`
+            });
+            setting["dirty"] = false;
+          }
+          setting["dirty"] = false;
+          setting["edit"] = false;
+          this.isLoading = false;
+          this.loadSettings();
+          this.snackBar.open('Settings saved!', 'close', {
+            panelClass: ['style-success'],
+          });
+        } else {
+          this.error = Array.isArray(res.message) ? res.message[0] : res?.message;
+          this.snackBar.open(this.error, 'close', { panelClass: ['style-error'] });
+          this.isLoading = false;
+        }
+      }, (err) => {
+        this.error = Array.isArray(err.message) ? err.message[0] : err?.message ? err?.message : err;
+        this.snackBar.open(this.error, 'close', { panelClass: ['style-error'] });
+        this.isLoading = false;
+      })
+    } catch (ex) {
+      this.error = Array.isArray(ex.message) ? ex.message[0] : ex?.message ? ex?.message : ex;
+      this.snackBar.open(this.error, 'close', { panelClass: ['style-error'] });
+      this.isLoading = false;
+    }
+  }
+
+  geocodeAddress(query: string) {
+    return this.geoLocationService.geocodeAddress(query).pipe(
+      map((response: any) => (response.data || []).map((item: any) => ({
+        label: item.address,
+        lat: item.coordinates.lat,
+        lng: item.coordinates.lng
+      }))),
+      catchError(error => {
+        console.error('Geocode error:', error);
+        return of([]); // fallback to empty array
+      })
+    );
+  }
+
+  onSearchAddressChange(value: any) {
+    // console.log(value);
+    if (value && value !== '') {
+      this.searchSubject.next(value);
+    } else {
+      this.locationOptions = []; // Hide dropdown
+      this.selectedCoords = null;
+    }
+  }
+
+  onAddressSelected(option: { lat: number; lng: number; label: string }) {
+    if (option) {
+      this.systemConfigs.find(x => x.key === "STORE_LOCATION_NAME").value = option.label;
+      this.systemConfigs.find(x => x.key === "STORE_LOCATION_NAME").dirty = true;
+      this.locationOptions = []; // Hide dropdown
+      this.selectedCoords = { lat: option.lat, lng: option.lng };
+      this.locationMapViewer.updateMapPin(option.lat, option.lng);
+      this.systemConfigs.find(x => x.key === "STORE_LOCATION_NAME").valid = true;
+    } else {
+      this.systemConfigs.find(x => x.key === "STORE_LOCATION_NAME").valid = false;
+    }
+
+    // Update the map viewer's marker
+  }
+
+  sendMessageToIframe(url, data = null, action: "updateContent" | "reload") {
+    console.log("url ", url);
+    console.log("data ", data);
+    console.log("action ", action);
+    const iframe = document.getElementById('historyIframe') as HTMLIFrameElement;
+    if (iframe) {
+      iframe.contentWindow?.postMessage({ action: action, data }, url);
+    }
+
+    if (!data["top"] || data["top"] === "" || !data["title"] || data["title"] === "" || !data["sub"] || data["sub"] === "" || !data["description"] || data["description"] === "") {
+      this.systemConfigs.find(x => x.key === "CLIENT_SITE_HISTORY_CONTENTS").valid = false;
+      this.systemConfigs.find(x => x.key === "CLIENT_SITE_HISTORY_CONTENTS").dirty = true;
+    } else {
+      this.systemConfigs.find(x => x.key === "CLIENT_SITE_HISTORY_CONTENTS").valid = true;
+    }
+  }
+
+
+  onMarkerChanged(coords: { lat: number; lng: number }) {
+    this.selectedCoords = coords;
+
+    this.geoLocationService.reverseGeocode(coords.lat, coords.lng).subscribe((label) => {
+      this.systemConfigs.find(x => x.key === "STORE_LOCATION_NAME").value = label;
+      this.systemConfigs.find(x => x.key === "STORE_LOCATION_NAME").valid = true;
+      this.systemConfigs.find(x => x.key === "STORE_LOCATION_NAME").dirty = true;
+    });
+  }
+
+  onSlideFileChange(event, slide: 1 | 2) {
+    const _value = this.systemConfigs.find(x => x.key === "CLIENT_SITE_SLIDES_CONTENTS").value;
+    console.log("value[slide]", _value[slide]);
+
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+
+    const file = input.files[0];
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      const value = this.systemConfigs.find(x => x.key === "CLIENT_SITE_SLIDES_CONTENTS").value;
+      value[slide]["image"] = reader.result as string;
+      value[slide]["fileName"] = file.name;
+      this.systemConfigs.find(x => x.key === "CLIENT_SITE_SLIDES_CONTENTS").value = value;
+      this.systemConfigs.find(x => x.key === "CLIENT_SITE_SLIDES_CONTENTS").valid = true;
+      this.systemConfigs.find(x => x.key === "CLIENT_SITE_SLIDES_CONTENTS").dirty = true;
+    };
+
+    reader.readAsDataURL(file);
+  }
+
+  pictureErrorHandler(event, slide) {
+    event.target.src = slide === 1 ? 'https://shaj-flower-shop-web-client-ochre.vercel.app/1-1.064affb871dee5ad.jpg' : 'https://shaj-flower-shop-web-client-ochre.vercel.app/1-2.b77f7996de58a054.jpg';
+  }
+}

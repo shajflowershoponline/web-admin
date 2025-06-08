@@ -1,0 +1,137 @@
+.settings-card {
+  box-shadow: none !important;
+  border: 1px solid #ddd;
+  border-radius: 8px; // optional for rounded corners
+
+  .settings-item-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .settings-item-content {
+    display: flex;
+    flex-direction: column;
+
+    .settings-item-content-text {
+      padding: 10px;
+    }
+  }
+}
+
+
+// .our-history-area {
+
+//   .container,
+//   .container-fluid,
+//   .container-lg,
+//   .container-md,
+//   .container-sm,
+//   .container-xl,
+//   .container-xxl {
+//     --bs-gutter-x: 1.5rem;
+//     --bs-gutter-y: 0;
+//     width: 100%;
+//     padding-right: calc(var(--bs-gutter-x) * .5);
+//     padding-left: calc(var(--bs-gutter-x) * .5);
+//     margin-right: auto;
+//     margin-left: auto
+//   }
+
+//   @media (min-width:576px) {
+
+//     .container,
+//     .container-sm {
+//       max-width: 540px
+//     }
+//   }
+
+//   @media (min-width:768px) {
+
+//     .container,
+//     .container-md,
+//     .container-sm {
+//       max-width: 720px
+//     }
+//   }
+
+//   @media (min-width:992px) {
+
+//     .container,
+//     .container-lg,
+//     .container-md,
+//     .container-sm {
+//       max-width: 960px
+//     }
+//   }
+
+//   @media (min-width:1200px) {
+
+//     .container,
+//     .container-lg,
+//     .container-md,
+//     .container-sm,
+//     .container-xl {
+//       max-width: 1140px
+//     }
+//   }
+
+//   @media (min-width:1400px) {
+
+//     .container,
+//     .container-lg,
+//     .container-md,
+//     .container-sm,
+//     .container-xl,
+//     .container-xxl {
+//       max-width: 1320px
+//     }
+//   }
+
+//   @include breakpoint(min-xl_device) {
+//     max-width: 1200px;
+//   }
+
+//   &.custom-area {
+//     padding-right: 15px;
+//     padding-left: 15px;
+
+//     .row {
+//       margin-right: -15px;
+//       margin-left: -15px;
+//     }
+
+//     .col-custom {
+//       padding-right: 15px;
+//       padding-left: 15px;
+//     }
+//   }
+
+//   &.custom-area-2 {
+//     .col-custom {
+//       padding-right: 15px;
+//       padding-left: 15px;
+//     }
+//   }
+
+//   .container.custom-area {
+//     padding-right: 15px;
+//     padding-left: 15px;
+//   }
+
+//   .container.custom-area .row {
+//     margin-right: -15px;
+//     margin-left: -15px;
+//   }
+
+//   .container.custom-area .col-custom {
+//     padding-right: 15px;
+//     padding-left: 15px;
+//   }
+
+//   .container.custom-area-2 .col-custom {
+//     padding-right: 15px;
+//     padding-left: 15px;
+//   }
+// }

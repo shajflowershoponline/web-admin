@@ -36,6 +36,7 @@
               "src/OneSignalSDKWorker.js"
             ],
             "styles": [
+              "node_modules/leaflet/dist/leaflet.css",
               "src/styles.scss",
               "src/global.scss"
             ],

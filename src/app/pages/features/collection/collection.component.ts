@@ -5,9 +5,13 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
 import moment from 'moment';
+import { Collection } from 'src/app/models/collection';
 import { AppConfigService } from 'src/app/services/app-config.service';
 import { CollectionService } from 'src/app/services/collection.service';
 import { StorageService } from 'src/app/services/storage.service';
+import { AlertDialogModel } from 'src/app/shared/components/alert-dialog/alert-dialog-model';
+import { AlertDialogComponent } from 'src/app/shared/components/alert-dialog/alert-dialog.component';
+import { ApiResponse } from 'src/app/shared/models/api-response.model';
 import { CollectionTableColumn } from 'src/app/shared/utility/table';
 import { convertNotationToObject } from 'src/app/shared/utility/utility';
 
@@ -95,7 +99,7 @@ export class CollectionComponent implements OnInit, AfterViewInit {
     try {
       this.isLoading = true;
       this.collectionService.getAdvanceSearch({
-        keywords: this.filterKeywords ,
+        keywords: this.filterKeywords,
         pageIndex: this.pageIndex,
         pageSize: this.pageSize
       })
@@ -111,6 +115,7 @@ export class CollectionComponent implements OnInit, AfterViewInit {
                 productCount: d.productCount,
                 thumbnailUrl: d.thumbnailFile?.url,
                 isSale: d.isSale,
+                isFeatured: d.isFeatured,
                 saleFromDate: moment(d.saleFromDate).format("YYYY-MM-DD"),
                 saleDueDate: moment(d.saleDueDate).format("YYYY-MM-DD"),
                 url: `/collection/${d.collectionId}`,
@@ -156,5 +161,68 @@ export class CollectionComponent implements OnInit, AfterViewInit {
 
   getDeafaultPicture() {
     return '../../../../assets/img/thumbnail-collection.png';
+  }
+
+  onToggleFeatured(item: CollectionTableColumn) {
+    const isFeatured: boolean = !item.isFeatured;
+    if (!item.collectionId) {
+      return;
+    }
+
+    const dialogData = new AlertDialogModel();
+    dialogData.title = 'Confirm';
+    dialogData.message = isFeatured ? 'Make this collection featured?' : 'Hide this collection from featured?';
+    dialogData.confirmButton = {
+      visible: true,
+      text: 'yes',
+      color: 'primary',
+    };
+    dialogData.dismissButton = {
+      visible: true,
+      text: 'cancel',
+    };
+    const dialogRef = this.dialog.open(AlertDialogComponent, {
+      maxWidth: '400px',
+      closeOnNavigation: true,
+    });
+    dialogRef.componentInstance.alertDialogConfig = dialogData;
+
+    dialogRef.componentInstance.conFirm.subscribe(async (data: any) => {
+      this.isProcessing = true;
+      dialogRef.componentInstance.isProcessing = this.isProcessing;
+      try {
+        this.isProcessing = true;
+        const params = {
+          isFeatured
+        };
+        const res: ApiResponse<Collection> = await this.collectionService.updateFeatured(item.collectionId, params).toPromise();
+        this.isProcessing = false;
+        if (res.success) {
+          this.snackBar.open('Saved!', 'close', {
+            panelClass: ['style-success'],
+          });
+          this.router.navigate(['/collection/' + res.data.collectionId]);
+          dialogRef.componentInstance.isProcessing = this.isProcessing;
+          dialogRef.close();
+        } else {
+          dialogRef.componentInstance.isProcessing = this.isProcessing;
+          this.error = typeof res?.message !== "string" && Array.isArray(res?.message)
+            ? res.message[0]
+            : res.message;
+          this.snackBar.open(this.error, 'close', {
+            panelClass: ['style-error'],
+          });
+          dialogRef.close();
+        }
+      } catch (e) {
+        this.isProcessing = false;
+        dialogRef.componentInstance.isProcessing = this.isProcessing;
+        this.error = typeof e.message !== "string" && Array.isArray(e.message) ? e.message[0] : e.message;
+        this.snackBar.open(this.error, 'close', {
+          panelClass: ['style-error'],
+        });
+        dialogRef.close();
+      }
+    });
   }
 }

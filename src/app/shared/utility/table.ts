@@ -93,6 +93,7 @@ export class CollectionTableColumn {
   productCount?: string;
   saleDueDate?: string;
   isSale: boolean;
+  isFeatured: boolean;
 }
 
 export class ProductTableColumn {
@@ -103,5 +104,17 @@ export class ProductTableColumn {
   size?: string;
   shortDesc?: string;
   category?: string;
+  url?: string;
+}
+
+export class OrderTableColumn {
+  orderId?: string;
+  orderCode?: string;
+  name?: string;
+  paymentMethod?: string;
+  deliveryAddress?: string;
+  total?: string;
+  status?: string;
+  createdAt?: string;
   url?: string;
 }

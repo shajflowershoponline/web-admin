@@ -1,1 +1,17 @@
-<p>order works!</p>
+<div class="content">
+  <div class="inner-content">
+    <mat-card [ngClass]="{ 'hidden': isLoading }">
+        <mat-card-content fxLayout="column" >
+          <app-data-table
+          [isLoading]="isLoading"
+          [dataSource]="dataSource"
+          [columnDefs]="appConfig.config.tableColumns.order"
+          [total]="total"
+          (pageChange)="pageChange($event)"
+          (sortChange)="sortChange($event)"
+          (filterChange)="filterChange($event)"
+          ></app-data-table>
+        </mat-card-content>
+    </mat-card>
+    </div>
+</div>

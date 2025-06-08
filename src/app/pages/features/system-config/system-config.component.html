@@ -1,0 +1,337 @@
+<mat-toolbar color="#fff" class="mat-elevation-z4">
+  <span class="title">System Config</span>
+  <span class="toolbar-item-spacer"></span>
+</mat-toolbar>
+<div class="content">
+  <div class="inner-content" fxLayout="column">
+    <div fxFlex="100" fxLayout="column" fxLayoutGap="16px">
+      @for (item of systemConfigs; track $index) {
+      <mat-card appearance="outline" class="settings-card">
+        <mat-card-content fxFlex="100" fxLayout="column" fxLayoutGap="16">
+          <div class="settings-item-header">
+            <h4>{{item?.title}}</h4>
+            @if (item.canEdit) {
+            @if(item.edit) {
+            <div>
+              <button [disabled]="!item.dirty || !item.valid" mat-icon-button
+                (click)="item.dirty ? onSaveSettings(item) : false">
+                <mat-icon>check</mat-icon>
+              </button>
+              <button mat-icon-button (click)="
+              item.edit = false;
+              item.dirty = false;
+              item.value = this.originalConfigs[$index].value;
+              item.key === 'CLIENT_SITE_HISTORY_CONTENTS' ? sendMessageToIframe(prod ? 'https://shaj-flower-shop-web-client-ochre.vercel.app/history' : 'http://localhost:4200/history', item?.value, 'reload') : false
+              ">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+            } @else {
+            <button mat-icon-button (click)="item.edit = !item.edit">
+              <mat-icon>edit</mat-icon>
+            </button>
+            }
+            }
+          </div>
+          <div class="settings-item-content">
+            <ng-container *ngIf="item?.key === 'DELIVERY_RATE' ||
+              item?.key === 'SOCIAL_FACEBOOK_LINK' ||
+              item?.key === 'STORE_SUPPORT_EMAIL' ||
+              item?.key === 'STORE_MOBILE_NUMBER'">
+              @if(item?.edit) {
+              <mat-form-field appearance="outline" fxFlex.gt-sm="100%" fxFlex="100" class="cell"
+                [ngClass.gt-sm]="{ isLargeScreen: true }">
+                <mat-label>{{ item?.title }}</mat-label>
+                <input matInput placeholder="{{ item?.title }}" [(ngModel)]="item.value" #model="ngModel" required
+                  (ngModelChange)="item.dirty = true;item.valid = item.value !== ''" />
+
+                <mat-error *ngIf="model.invalid && model.touched">
+                  {{ item.title }} is required.
+                </mat-error>
+              </mat-form-field>
+
+              } @else {
+              @if (item?.key === 'SOCIAL_FACEBOOK_LINK') {
+              <a href="{{item?.value}}" target="_blank">{{item?.value}}</a>
+              } @else {
+              <span class="settings-item-content-text">
+                @if(item?.key === 'DELIVERY_RATE') {
+                {{item?.value | currency: 'PHP'}}
+                } @else {
+                {{item?.value}}
+                }
+              </span>
+              }
+
+              }
+            </ng-container>
+            <ng-container *ngIf="item?.key === 'STORE_LOCATION_NAME'">
+              @if(item?.edit) {
+              <mat-form-field appearance="outline" fxFlex.gt-sm="100%" fxFlex="100" class="cell"
+                [ngClass.gt-sm]="{ isLargeScreen: true }">
+                <mat-label>{{ item?.title }}</mat-label>
+                <input matInput placeholder="{{ item?.title }}" [(ngModel)]="item.value" #model="ngModel" required
+                  (ngModelChange)="onSearchAddressChange($event)" [matAutocomplete]="auto" />
+
+                <mat-error *ngIf="model.invalid && model.touched">
+                  {{ item.title }} is required.
+                </mat-error>
+              </mat-form-field>
+              <mat-autocomplete #auto="matAutocomplete">
+                <mat-option (click)="onAddressSelected(option)" *ngFor="let option of locationOptions"
+                  [value]="option.label">
+                  {{ option.label }}
+                </mat-option>
+              </mat-autocomplete>
+              } @else {
+              <span class="settings-item-content-text">{{item?.value}}</span>
+              }
+              <app-location-map-viewer #locationMapViewer [readOnly]="item.edit"
+                (onMarkerChange)="onMarkerChanged($event)" [selectedCoords]="selectedCoords"></app-location-map-viewer>
+            </ng-container>
+            <ng-container *ngIf="item?.key === 'CLIENT_SITE_SLIDES_CONTENTS'">
+              <div fxLayout="column" fxFlex="100" fxLayoutGap="16px">
+                <!-- slide 1 -->
+                <div fxLayout="column" fxLayout.gt-sm="row" fxFlex="100" fxLayoutGap="16px">
+                  <div fxLayout="column" fxFlex.gt-sm="30" *ngIf="item?.edit">
+                    <div fxLayout="column" fxLayoutGap="16px">
+                      <span>Slide 1</span>
+                      <mat-form-field appearance="outline" fxFlex="100">
+                        <mat-label>Title</mat-label>
+                        <input matInput placeholder="Title" [(ngModel)]="item.value['1']['title']" #title1Model="ngModel" required
+                          (ngModelChange)="item.dirty = true;item.valid = title1Model.value && title1Model.value !== ''" />
+                        <mat-error *ngIf="title1Model.invalid && title1Model.touched">
+                          Title is required.
+                        </mat-error>
+                      </mat-form-field>
+                      <mat-form-field appearance="outline" fxFlex="100">
+                        <mat-label>Description</mat-label>
+                        <textarea style="height: 200px;" matInput placeholder="Description" [(ngModel)]="item.value['1']['description']" #description1Model="ngModel" required
+                          (ngModelChange)="item.dirty = true;item.valid = description1Model.value && description1Model.value !== ''" ></textarea>
+                        <mat-error *ngIf="description1Model.invalid && description1Model.touched">
+                          Description is required.
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                  <div fxLayout="column" fxFlex>
+                    <div fxLayout="column" fxFlex="100">
+                      <div style="width: 100%;height: 100%;display: flex;position: relative;">
+                        <div style="
+                            width: 100%;
+                            display: flex;
+                            position: absolute;
+                            z-index: 1;
+                            height: 100%;
+                            align-content: center;
+                            flex-direction: column;
+                            justify-content: center;
+                            box-sizing: border-box;
+                            padding: 30px;">
+                          <h2 style="font-weight: 500!important;">{{item.value['1']['title']}}</h2>
+                          <span style="max-width: 500px;">{{item.value['1']['description']}}</span>
+                        </div>
+                        <div style="width: 100%;display: flex;">
+                          <button
+                            mat-icon-button
+                            (click)="slide1FileUpload.click()"
+                            *ngIf="item?.edit"
+                            style="
+                            position: absolute;
+                            right: 0;
+                            z-index: 10;">
+                            <mat-icon>upload_file</mat-icon>
+                          </button>
+                          <input #slide1FileUpload style="display: none!important;" type="file" (change)="onSlideFileChange($event, 1)" [accept]="acceptedTypes" />
+                          <img (error)="pictureErrorHandler($event)" style="width: 100%;max-height:300px;object-fit: cover;" [src]="item?.value['1']['image'] ? item?.value['1']['image'] : 'https://shaj-flower-shop-web-client-ochre.vercel.app/1-1.064affb871dee5ad.jpg'" alt="">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- slide 2 -->
+                <div fxLayout="column" fxLayout.gt-sm="row" fxFlex="100" fxLayoutGap="16px">
+                  <div fxLayout="column" fxFlex.gt-sm="30" *ngIf="item?.edit">
+                    <div fxLayout="column" fxLayoutGap="16px">
+                      <span>Slide 2</span>
+                      <mat-form-field appearance="outline" fxFlex="100">
+                        <mat-label>Title</mat-label>
+                        <input matInput placeholder="Title" [(ngModel)]="item.value['2']['title']" #title2Model="ngModel" required
+                          (ngModelChange)="item.dirty = true;item.valid = title2Model.value && title2Model.value !== ''" />
+                        <mat-error *ngIf="title2Model.invalid && title2Model.touched">
+                          Title is required.
+                        </mat-error>
+                      </mat-form-field>
+                      <mat-form-field appearance="outline" fxFlex="100">
+                        <mat-label>Description</mat-label>
+                        <textarea style="height: 200px;" matInput placeholder="Description" [(ngModel)]="item.value['2']['description']" #description2Model="ngModel" required
+                          (ngModelChange)="item.dirty = true;item.valid = description2Model.value && description2Model.value !== ''" ></textarea>
+                        <mat-error *ngIf="description2Model.invalid && description2Model.touched">
+                          Description is required.
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                  <div fxLayout="column" fxFlex>
+                    <div fxLayout="column" fxFlex="100">
+                      <div style="width: 100%;height: 100%;display: flex;position: relative;">
+                        <div style="
+                              width: 100%;
+                              display: flex;
+                              position: absolute;
+                              z-index: 1;
+                              height: 100%;
+                              align-content: center;
+                              flex-direction: column;
+                              justify-content: center;
+                              box-sizing: border-box;
+                              padding: 30px;">
+                          <h2 style="font-weight: 500!important;">{{item.value['2']['title']}}</h2>
+                          <span style="max-width: 500px;">{{item.value['2']['description']}}</span>
+                        </div>
+                        <div style="width: 100%;display: flex;">
+                          <button
+                            mat-icon-button
+                            (click)="slide2FileUpload.click()"
+                            *ngIf="item?.edit"
+                            style="
+                            position: absolute;
+                            right: 0;
+                            z-index: 10;">
+                            <mat-icon>upload_file</mat-icon>
+                          </button>
+                          <input #slide2FileUpload style="display: none!important;" type="file" (change)="onSlideFileChange($event, 2)" [accept]="acceptedTypes" />
+                          <img (error)="pictureErrorHandler($event)" style="width: 100%;max-height:300px;object-fit: cover;" [src]="item?.value['2']['image'] ? item?.value['2']['image']  : 'https://shaj-flower-shop-web-client-ochre.vercel.app/1-2.b77f7996de58a054.jpg'" alt="">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+            <ng-container *ngIf="item?.key === 'CLIENT_SITE_HISTORY_CONTENTS'">
+              <div style="display: flex;flex-direction: row;">
+                <div *ngIf="item?.edit"
+                  style="display: flex;flex-direction: column;box-sizing: border-box;padding-right: 10px!important;"
+                  [style]="{ 'width': item?.edit ? '30%!important' : 'auto!important'}">
+                  <div>
+                    <mat-form-field appearance="outline" fxFlex.gt-sm="100%" fxFlex="100" class="cell"
+                      [ngClass.gt-sm]="{ isLargeScreen: true }">
+                      <mat-label>Top title</mat-label>
+                      <input matInput placeholder="Top title" [(ngModel)]="item.value['top']" #topModel="ngModel"
+                        required
+                        (ngModelChange)="item.dirty = true;sendMessageToIframe(prod ? 'https://shaj-flower-shop-web-client-ochre.vercel.app/history' : 'http://localhost:4200/history', item?.value, 'updateContent');" />
+
+                      <mat-error *ngIf="topModel.invalid && topModel.touched">
+                        Top title is required.
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div>
+                    <mat-form-field appearance="outline" fxFlex.gt-sm="100%" fxFlex="100" class="cell"
+                      [ngClass.gt-sm]="{ isLargeScreen: true }">
+                      <mat-label>Main title</mat-label>
+                      <input matInput placeholder="Main title" [(ngModel)]="item.value['title']"
+                        #mainTitleModel="ngModel" required
+                        (ngModelChange)="item.dirty = true;sendMessageToIframe(prod ? 'https://shaj-flower-shop-web-client-ochre.vercel.app/history' : 'http://localhost:4200/history', item?.value , 'updateContent')" />
+
+                      <mat-error *ngIf="mainTitleModel.invalid && mainTitleModel.touched">
+                        Main title is required.
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div>
+                    <mat-form-field appearance="outline" fxFlex.gt-sm="100%" fxFlex="100" class="cell"
+                      [ngClass.gt-sm]="{ isLargeScreen: true }">
+                      <mat-label>Sub title</mat-label>
+                      <input matInput placeholder="Sub title" [(ngModel)]="item.value['sub']" #subTitleModel="ngModel"
+                        required
+                        (ngModelChange)="item.dirty = true;sendMessageToIframe(prod ? 'https://shaj-flower-shop-web-client-ochre.vercel.app/history' : 'http://localhost:4200/history', item?.value , 'updateContent')" />
+
+                      <mat-error *ngIf="subTitleModel.invalid && subTitleModel.touched">
+                        Main title is required.
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div>
+                    <mat-form-field appearance="outline" fxFlex.gt-sm="100%" fxFlex="100" class="cell"
+                      [ngClass.gt-sm]="{ isLargeScreen: true }">
+                      <mat-label>Description</mat-label>
+                      <textarea matInput placeholder="Sub title" [(ngModel)]="item.value['description']"
+                        #descriptionModel="ngModel" required
+                        (ngModelChange)="item.dirty = true;sendMessageToIframe(prod ? 'https://shaj-flower-shop-web-client-ochre.vercel.app/history' : 'http://localhost:4200/history', item?.value , 'updateContent')"
+                        style="height: 200px;"></textarea>
+
+                      <mat-error *ngIf="descriptionModel.invalid && descriptionModel.touched">
+                        Description is required.
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div style="display: flex;flex-direction: column;width: 100%!important;"
+                  [style]="{ 'width': !item?.edit ? '100%!important' : '70%!important'}">
+                  <iframe id="historyIframe" *ngIf="!prod; else prodContent" src="http://localhost:4200/history"
+                    width="100%" height="500px" style="border: none;"></iframe>
+
+                  <ng-template #prodContent>
+                    <iframe id="historyIframe" src="https://shaj-flower-shop-web-client-ochre.vercel.app/history"
+                      width="100%" height="500px" style="border: none;"></iframe>
+                  </ng-template>
+                </div>
+              </div>
+
+            </ng-container>
+            <ng-container *ngIf="item?.key === 'CLIENT_SITE_FOOTER_BANNER_CONTENT'">
+              <div style="display: flex;flex-direction: row;">
+                <div *ngIf="item?.edit"
+                  style="display: flex;flex-direction: column;box-sizing: border-box;padding-right: 10px!important;"
+                  [style]="{ 'width': item?.edit ? '50%!important' : 'auto!important'}">
+                  <div>
+                    <mat-form-field appearance="outline" fxFlex.gt-sm="100%" fxFlex="100" class="cell"
+                      [ngClass.gt-sm]="{ isLargeScreen: true }">
+                      <mat-label>Title</mat-label>
+                      <input matInput placeholder="Title" [(ngModel)]="item.value['title']" #titleModel="ngModel" required
+                        (ngModelChange)="item.dirty = true;item.valid = titleModel.value && titleModel.value !== ''" />
+                      <mat-error *ngIf="titleModel.invalid && titleModel.touched">
+                        Title is required.
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div>
+                    <mat-form-field appearance="outline" fxFlex.gt-sm="100%" fxFlex="100" class="cell"
+                      [ngClass.gt-sm]="{ isLargeScreen: true }">
+                      <mat-label>Description</mat-label>
+                      <textarea style="height: 200px;" matInput placeholder="Description" [(ngModel)]="item.value['description']" #descriptionModel="ngModel" required
+                        (ngModelChange)="item.dirty = true;item.valid = descriptionModel.value && descriptionModel.value !== ''" ></textarea>
+                      <mat-error *ngIf="descriptionModel.invalid && descriptionModel.touched">
+                        Description is required.
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+                <div style="
+                  background-color: #1b1b1b;
+                  color: #fff;
+                  padding: 30px;
+                  display: flex;
+                  flex-direction: column;
+                  width: 100%!important;"
+                  [style]="{ 'width': !item?.edit ? '100%!important' : '50%!important'}">
+                  <div class="desc-content">
+                    <p style="margin-bottom: 10px;">
+                      {{item?.value?.title}}
+                    </p>
+                    <p>
+                      {{item?.value?.description}}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </mat-card-content>
+      </mat-card>
+      }
+    </div>
+  </div>
+</div>

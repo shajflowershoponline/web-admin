@@ -10,6 +10,7 @@ export class Collection {
   active: boolean;
   thumbnailFile: File;
   isSale: boolean;
+  isFeatured: boolean;
   saleFromDate: Date;
   saleDueDate: Date;
   productCollections: ProductCollection[];

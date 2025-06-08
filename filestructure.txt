@@ -34,11 +34,13 @@
             |-- discounts.ts
             |-- file.ts
             |-- gift-add-ons.ts
+            |-- order.ts
             |-- product-collection.ts
             |-- product-image.ts
             |-- product.ts
             |-- staff-access.ts
             |-- staff-user.ts
+            |-- system-config.ts
         |-- pages
             |-- auth
                 |-- auth.component.html
@@ -123,6 +125,11 @@
                     |-- gift-add-ons.component.ts
                     |-- gift-add-ons.module.ts
                 |-- order
+                    |-- order-details
+                        |-- order-details.component.html
+                        |-- order-details.component.scss
+                        |-- order-details.component.spec.ts
+                        |-- order-details.component.ts
                     |-- order-routing.module.ts
                     |-- order.component.html
                     |-- order.component.scss
@@ -186,6 +193,13 @@
                     |-- staff-user.component.spec.ts
                     |-- staff-user.component.ts
                     |-- staff-user.module.ts
+                |-- system-config
+                    |-- system-config-routing.module.ts
+                    |-- system-config.component.html
+                    |-- system-config.component.scss
+                    |-- system-config.component.spec.ts
+                    |-- system-config.component.ts
+                    |-- system-config.module.ts
             |-- no-access
                 |-- no-access.component.html
                 |-- no-access.component.scss
@@ -228,12 +242,16 @@
             |-- dashboard.service.ts
             |-- discounts.service.spec.ts
             |-- discounts.service.ts
+            |-- geo-location.service.spec.ts
+            |-- geo-location.service.ts
             |-- gift-add-ons.service.spec.ts
             |-- gift-add-ons.service.ts
             |-- interface
                 |-- iservices.ts
             |-- one-signal.service.spec.ts
             |-- one-signal.service.ts
+            |-- order.service.spec.ts
+            |-- order.service.ts
             |-- product-collection.service.spec.ts
             |-- product-collection.service.ts
             |-- product.service.spec.ts
@@ -248,6 +266,8 @@
             |-- staff-user.service.ts
             |-- storage.service.spec.ts
             |-- storage.service.ts
+            |-- system-config.service.spec.ts
+            |-- system-config.service.ts
         |-- shared
             |-- components
                 |-- access-pages-table
@@ -302,6 +322,11 @@
                 |-- shared-components.module.ts
             |-- form-validation
                 |-- error-state.matcher.ts
+            |-- location-map-viewer
+                |-- location-map-viewer.component.html
+                |-- location-map-viewer.component.scss
+                |-- location-map-viewer.component.spec.ts
+                |-- location-map-viewer.component.ts
             |-- material
                 |-- material.module.ts
             |-- models
@@ -346,6 +371,9 @@
             |-- banner-white.png
             |-- banner.png
             |-- intro-waving.png
+            |-- leaflet-marker-icon-2x.png
+            |-- leaflet-marker-icon.png
+            |-- leaflet-marker-shadow.png
             |-- person-female.png
             |-- person.png
             |-- pin-location.gif

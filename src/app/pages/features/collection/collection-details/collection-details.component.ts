@@ -61,10 +61,12 @@ export class CollectionDetailsComponent implements OnInit {
     sequenceId: new FormControl(null, [Validators.required]),
     name: new FormControl(null, [Validators.required]),
     desc: new FormControl(null, [Validators.required]),
+    isFeatured: new FormControl(false),
     isSale: new FormControl(false),
     saleFromDate: new FormControl(new Date().toISOString(), [Validators.required]),
     saleDueDate: new FormControl(new Date().toISOString(), [Validators.required]),
-    selectedDiscounts: new FormControl([], [Validators.required]),
+    selectedDiscounts: new FormControl(),
+    productIds: new FormControl()
   }
   );
   mediaWatcher: Subscription;
@@ -140,14 +142,18 @@ export class CollectionDetailsComponent implements OnInit {
     return this.collectionForm.valid;
   }
   get formIsReady() {
-    return this.collectionForm.valid && this.collectionForm.dirty;
+    const newProductIds = this.productCollectionDataSource?.data.map(x => x.productId) ?? [];
+    const oldProductIds = this.collection?.productCollections?.map(x => x.product.productId) ?? [];
+    const hasChanges = newProductIds.length !== oldProductIds.length ||
+      new Set(newProductIds).size !== new Set([...newProductIds, ...oldProductIds]).size;
+    return this.collectionForm.dirty || hasChanges;
   }
   get formData() {
     const data = this.collectionForm.value;
     data.sequenceId = data?.sequenceId?.toString();
-    data.thumbnailFile = this.collectionThumbnail;
-    data.productIds = this.productCollectionDataSource.data.map(x => x.productId);
     data.selectedDiscounts = (data.selectedDiscounts ?? []) as Discounts[];
+    data.thumbnailFile = this.collectionThumbnail;
+    data.productIds = this.productCollectionDataSource?.data.map(x => x.productId);
     data.discountTagsIds = ((data.selectedDiscounts ?? []) as Discounts[]).map(x => x.discountId);
     return data;
   }
@@ -167,15 +173,13 @@ export class CollectionDetailsComponent implements OnInit {
       if (res) {
         this.collectionForm.get("saleFromDate").enable({ emitEvent: false });
         this.collectionForm.get("saleDueDate").enable({ emitEvent: false });
-        this.collectionForm.controls["selectedDiscounts"].addValidators(Validators.required);
+        this.collectionForm.controls["selectedDiscounts"] = new FormControl(null, [Validators.required]);
       } else {
         this.collectionForm.get("saleFromDate").disable();
         this.collectionForm.get("saleDueDate").disable();
-        this.collectionForm.controls["selectedDiscounts"] = new FormControl([]);
-        this.collectionForm.controls["selectedDiscounts"].removeValidators(Validators.required);
+        this.collectionForm.controls["selectedDiscounts"].setValidators(null);
       }
     });
-
   }
 
   ngAfterViewInit() {
@@ -192,11 +196,12 @@ export class CollectionDetailsComponent implements OnInit {
       ]).subscribe(([collection]) => {
         if (collection.success) {
           this.collection = collection.data;
-          this.collectionForm.setValue({
+          this.collectionForm.patchValue({
             sequenceId: collection.data.sequenceId,
             name: collection.data.name,
             desc: collection.data.desc,
             isSale: collection.data.isSale,
+            isFeatured: collection.data.isFeatured,
             saleFromDate: collection.data.saleFromDate,
             saleDueDate: collection.data.saleDueDate,
             selectedDiscounts: collection.data.selectedDiscounts,
@@ -225,10 +230,12 @@ export class CollectionDetailsComponent implements OnInit {
             this.collectionForm.get("saleFromDate").enable();
             this.collectionForm.get("saleDueDate").enable();
             this.collectionForm.get("isSale").setValue(true, { emitEvent: false });
+            this.collectionForm.controls["selectedDiscounts"] = new FormControl(this.collection.selectedDiscounts, [Validators.required]);
           } else {
             this.collectionForm.get("saleFromDate").disable();
             this.collectionForm.get("saleDueDate").disable();
             this.collectionForm.get("isSale").setValue(false, { emitEvent: false });
+            this.collectionForm.controls["selectedDiscounts"] = new FormControl(null);
           }
           this.isLoading = false;
         } else {
@@ -287,19 +294,25 @@ export class CollectionDetailsComponent implements OnInit {
       if (index > -1) {
         const currentSelected = this.formData.selectedDiscounts;
         currentSelected.splice(index, 1);
-        this.collectionForm.get("selectedDiscounts").setValue(currentSelected);
-        this.collectionForm.get("selectedDiscounts").markAsDirty();
+        this.collectionForm.controls["selectedDiscounts"].setValue(currentSelected);
+        this.collectionForm.controls["productIds"].setValue(currentSelected);
       } else {
         const currentSelected = this.formData.selectedDiscounts;
         currentSelected.push(option as Discounts);
-        this.collectionForm.get("selectedDiscounts").setValue(currentSelected);
-        this.collectionForm.get("selectedDiscounts").markAsDirty();
+        this.collectionForm.controls["selectedDiscounts"].setValue(currentSelected);
+        this.collectionForm.controls["productIds"].setValue(currentSelected);
       }
+      this.collectionForm.controls["selectedDiscounts"].markAsDirty();
+      this.collectionForm.controls["selectedDiscounts"].markAsTouched();
+      this.collectionForm.controls["selectedDiscounts"].markAllAsTouched();
+      this.collectionForm.controls["productIds"].markAsDirty();
+      this.collectionForm.controls["productIds"].markAsTouched();
+      this.collectionForm.controls["productIds"].markAllAsTouched();
     }
   }
 
-  isSelectedMultiSelect(option: any| Discounts, type: "discounts"): boolean {
-    if(type === "discounts") {
+  isSelectedMultiSelect(option: any | Discounts, type: "discounts"): boolean {
+    if (type === "discounts") {
       return this.formData.selectedDiscounts.some(o => o.discountId === (option as Discounts).discountId);
     } else {
       return false;
@@ -625,6 +638,9 @@ export class CollectionDetailsComponent implements OnInit {
 
         this.productCollectionDataSource.data = items;
         this.productDialog.close(res.data);
+        this.collectionForm.controls["productIds"].setValue(this.productCollectionDataSource.data.map(x=>x.productId));
+        this.collectionForm.controls["productIds"].markAsTouched();
+        this.collectionForm.controls["productIds"].markAsDirty();
       } else {
         const error = Array.isArray(res.message) ? res.message[0] : res.message;
         this.snackBar.open(error, 'close', { panelClass: ['style-error'] });
@@ -638,5 +654,8 @@ export class CollectionDetailsComponent implements OnInit {
   deleteProductCollectionItem(data: ProductCollectionTableColumn) {
     const newItems = this.productCollectionDataSource.data.filter(x => x.sku !== data.sku);
     this.productCollectionDataSource.data = newItems;
+    this.collectionForm.controls["productIds"].setValue(this.productCollectionDataSource.data.map(x=>x.productId));
+    this.collectionForm.controls["productIds"].markAsTouched();
+    this.collectionForm.controls["productIds"].markAsDirty();
   }
 }

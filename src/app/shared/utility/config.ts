@@ -22,6 +22,7 @@ export interface AppConfig {
       category: ColumnDefinition[];
       giftAddOns: ColumnDefinition[];
       discounts: ColumnDefinition[];
+      order: ColumnDefinition[];
     };
     sessionConfig: {
       sessionTimeout: string;
@@ -84,6 +85,7 @@ export interface AppConfig {
         getByCode: string;
         create: string;
         update: string;
+        updateFeatured: string;
         updateOrder: string;
         getAdvanceSearch: string;
         delete: string;
@@ -95,18 +97,26 @@ export interface AppConfig {
         getAdvanceSearch: string;
         delete: string;
       };
-      orders: {
+      order: {
         getAdvanceSearch: string;
         getByCode: string;
+        updateStatus: string;
       },
       settings: {
         getAll: string;
         find: string;
-        update: string;
-        uploadCertificateTemplate: string;
+        save: string;
       };
       dashboard: {
       };
       message: { create: string };
+      systemConfig: {
+        getAll: string;
+        find: string;
+        update: string;
+      },
+      geolocation: {
+        searchAddress: string;
+      }
     };
   }

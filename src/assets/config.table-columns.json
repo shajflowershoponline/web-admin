@@ -162,6 +162,93 @@
         }
       }
     ],
+    "order": [
+      {
+        "name": "orderCode",
+        "label": "#",
+        "apiNotation": "orderCode",
+        "sticky": true,
+        "type": "string",
+        "style": {
+          "width": "100px",
+          "left": "0px"
+        },
+        "filterOptions": {
+          "enable": true,
+          "placeholder": "Order Code"
+        },
+        "urlPropertyName": "url"
+      },
+      {
+        "name": "status",
+        "label": "Status",
+        "apiNotation": "status",
+        "type": "string",
+        "filterOptions": {
+          "enable": true,
+          "placeholder": "Status"
+        }
+      },
+      {
+        "name": "createdAt",
+        "label": "Date",
+        "apiNotation": "createdAt",
+        "type": "date",
+        "format": {
+          "type": "date-time",
+          "custom": "MMM dd, yyyy"
+        },
+        "filterOptions": {
+          "enable": true,
+          "type": "date-range",
+          "placeholder": "Date"
+        }
+      },
+      {
+        "name": "name",
+        "label": "Name",
+        "apiNotation": "name",
+        "type": "string",
+        "filterOptions": {
+          "enable": true,
+          "placeholder": "Name"
+        }
+      },
+      {
+        "name": "paymentMethod",
+        "label": "Payment Method",
+        "apiNotation": "paymentMethod",
+        "type": "string",
+        "filterOptions": {
+          "enable": true,
+          "placeholder": "Payment Method"
+        }
+      },
+      {
+        "name": "deliveryAddress",
+        "label": "Delivery To",
+        "apiNotation": "deliveryAddress",
+        "type": "string",
+        "filterOptions": {
+          "enable": true,
+          "placeholder": "Delivery To"
+        }
+      },
+      {
+        "name": "total",
+        "label": "Total Payment",
+        "apiNotation": "total",
+        "type": "number",
+        "format": {
+          "type": "currency"
+        },
+        "filterOptions": {
+          "enable": true,
+          "placeholder": "Total Payment",
+          "type": "number-range"
+        }
+      }
+    ],
     "category": [
       {
         "name": "categoryId",

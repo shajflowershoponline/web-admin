@@ -57,8 +57,8 @@ export class ProductDetailsComponent implements OnInit {
     longDesc: new FormControl('', [ Validators.required]),
     categoryId: new FormControl('', [ Validators.required]),
     productImages: new FormControl([], [Validators.required]),
-    selectedGiftAddOns: new FormControl([], [Validators.required]),
-    selectedDiscounts: new FormControl([], [Validators.required]),
+    selectedGiftAddOns: new FormControl([]),
+    selectedDiscounts: new FormControl([]),
     updateImage: new FormControl(false),
     }
   );
@@ -138,10 +138,12 @@ export class ProductDetailsComponent implements OnInit {
     return this.productForm.controls;
   }
   get formIsValid() {
+    console.log("this.productForm.valid && this.categorySearchCtrl.valid ", this.productForm.valid && this.categorySearchCtrl.valid)
     return this.productForm.valid && this.categorySearchCtrl.valid;
   }
   get formIsReady() {
-    return (this.productForm.valid && this.categorySearchCtrl.valid) && (this.productForm.dirty || this.categorySearchCtrl.dirty);
+    console.log("this.productForm.valid && this.categorySearchCtrl.valid && (this.productForm.dirty || this.categorySearchCtrl.dirty)", this.productForm.valid && this.categorySearchCtrl.valid && (this.productForm.dirty || this.categorySearchCtrl.dirty))
+    return this.productForm.valid && this.categorySearchCtrl.valid && (this.productForm.dirty || this.categorySearchCtrl.dirty);
   }
   get formData() {
     const data = this.productForm.value;
@@ -222,6 +224,8 @@ export class ProductDetailsComponent implements OnInit {
             this.searchDiscountsCtrl.disable();
           }
           this.categorySearchCtrl.setValue(product.data.category?.categoryId);
+          this.productForm.markAsPristine();
+          this.productForm.markAsUntouched();
           this.isLoading = false;
         } else {
           this.isLoading = false;

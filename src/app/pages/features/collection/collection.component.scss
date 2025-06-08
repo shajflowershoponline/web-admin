@@ -4,7 +4,7 @@
     box-sizing: border-box;
     padding: 10px;
     mat-card {
-      height: 330px;
+      min-height: 330px;
       cursor: pointer;
       &.is-loading {
         cursor: progress;

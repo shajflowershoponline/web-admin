@@ -24,7 +24,7 @@
       Edit
     </button>
     <button *ngIf="!isReadOnly" mat-raised-button color="primary" matTooltip="{{isNew ? 'Save' : 'Update'}}"
-      [disabled]="!formIsReady && !formIsValid" form="productForm" type="submit">
+      [disabled]="!formIsReady || !formIsValid" form="productForm" type="submit">
       {{isNew ? 'Save' : 'Update'}}
     </button>
   </div>
@@ -186,7 +186,7 @@
                 <mat-chip *ngFor="let option of formData.selectedGiftAddOns" removable
                   (removed)="toggleMultiSelection(option, 'gift-add-ons')">
                   {{ option.name }}
-                  <mat-icon matChipRemove>cancel</mat-icon>
+                  <mat-icon *ngIf="!isReadOnly" matChipRemove>cancel</mat-icon>
                 </mat-chip>
               </mat-chip-listbox>
             </div>
@@ -215,7 +215,7 @@
                 <mat-chip *ngFor="let option of formData.selectedDiscounts" removable
                   (removed)="toggleMultiSelection(option, 'discounts')">
                   {{ option.promoCode }}
-                  <mat-icon matChipRemove>cancel</mat-icon>
+                  <mat-icon *ngIf="!isReadOnly" matChipRemove>cancel</mat-icon>
                 </mat-chip>
               </mat-chip-listbox>
             </div>

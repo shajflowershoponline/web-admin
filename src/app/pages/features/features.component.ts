@@ -91,7 +91,6 @@ export class FeaturesComponent implements OnInit, AfterViewInit{
   }
 
   onActivate(event) {
-    console.log(event);
     this.currentGroup = event?.route?.snapshot?.data["group"] && event?.route?.snapshot?.data["group"] !== undefined ? event?.route?.snapshot?.data["group"] : null;
     this.onResize();
     setTimeout(()=> {

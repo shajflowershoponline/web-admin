@@ -27,6 +27,11 @@ const routes: Routes = [
             (m) => m.DashboardModule
           ),
       },
+      { path: 'orders',
+        canActivate: [AuthGuard],
+        data: { title: 'Orders' },
+        loadChildren: () => import('./pages/features/order/order.module').then(m => m.OrderModule)
+      },
       {
         path: 'customer-user',
         canActivate: [AuthGuard],
@@ -96,6 +101,13 @@ const routes: Routes = [
         data: { title: 'Staff User', group: 'User Management' },
         loadChildren: () =>
           import('./pages/features/staff-user/staff-user.module').then((m) => m.StaffUserModule),
+      },
+      {
+        path: 'system-config',
+        canActivate: [AuthGuard],
+        data: { title: 'System Config', group: 'SystemConfig' },
+        loadChildren: () =>
+          import('./pages/features/system-config/system-config.module').then((m) => m.SystemConfigModule),
       }
     ],
   },
@@ -137,13 +149,6 @@ const routes: Routes = [
     path: 'no-access',
     component: NoAccessComponent,
   },
-  { path: 'customer-user', loadChildren: () => import('./pages/features/customer-user/customer-user.module').then(m => m.CustomerUserModule) },
-  { path: 'staff-user', loadChildren: () => import('./pages/features/staff-user/staff-user.module').then(m => m.StaffUserModule) },
-  { path: 'product', loadChildren: () => import('./pages/features/product/product.module').then(m => m.ProductModule) },
-  { path: 'category', loadChildren: () => import('./pages/features/category/category.module').then(m => m.CategoryModule) },
-  { path: 'order', loadChildren: () => import('./pages/features/order/order.module').then(m => m.OrderModule) },
-  { path: 'collection', loadChildren: () => import('./pages/features/collection/collection.module').then(m => m.CollectionModule) },
-  { path: 'payments', loadChildren: () => import('./pages/features/payments/payments.module').then(m => m.PaymentsModule) },
   {
     path: '**',
     component: PageNotFoundComponent,
