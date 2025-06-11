@@ -144,7 +144,7 @@
       {
         "name": "category",
         "label": "Category",
-        "apiNotation": "category",
+        "apiNotation": "category.name",
         "type": "string",
         "filterOptions": {
           "enable": true,

@@ -140,8 +140,8 @@
                       [formControl]="categorySearchCtrl" [matAutocomplete]="autoCategory"
                       (focusout)="mapSearchCategory();" #categorySearchInput (input)="isOptionsCategoryLoading = true;">
                     <mat-autocomplete #autocompleteCategory #autoCategory="matAutocomplete"
-                      [displayWith]="displayCategoryName.bind(this)"
-                      (optionSelected)="f['categoryId'].setValue($event.option.value)">
+                      [displayWith]="displayCategoryName"
+                      (optionSelected)="onCategorySelected($event.option.value)">
                       <mat-option *ngFor="let option of optionsCategory" [value]="option.code">
                         {{option.name}}
                       </mat-option>

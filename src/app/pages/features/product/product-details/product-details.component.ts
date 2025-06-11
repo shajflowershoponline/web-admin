@@ -50,17 +50,17 @@ export class ProductDetailsComponent implements OnInit {
   productForm: FormGroup = new FormGroup({
     sku: new FormControl(),
     name: new FormControl('', [Validators.required]),
-    shortDesc: new FormControl('', [ Validators.required]),
-    price: new FormControl(0, [ Validators.required]),
-    color: new FormControl(0, [ Validators.required]),
-    size: new FormControl(0, [ Validators.required]),
-    longDesc: new FormControl('', [ Validators.required]),
-    categoryId: new FormControl('', [ Validators.required]),
+    shortDesc: new FormControl('', [Validators.required]),
+    price: new FormControl(0, [Validators.required]),
+    color: new FormControl(0, [Validators.required]),
+    size: new FormControl(0, [Validators.required]),
+    longDesc: new FormControl('', [Validators.required]),
+    categoryId: new FormControl('', [Validators.required]),
     productImages: new FormControl([], [Validators.required]),
     selectedGiftAddOns: new FormControl([]),
     selectedDiscounts: new FormControl([]),
     updateImage: new FormControl(false),
-    }
+  }
   );
   mediaWatcher: Subscription;
   matcher = new MyErrorStateMatcher();
@@ -70,8 +70,8 @@ export class ProductDetailsComponent implements OnInit {
 
   categorySearchCtrl = new FormControl()
   isOptionsCategoryLoading = false;
-  optionsCategory: { name: string; code: string}[] = [];
-  @ViewChild('categorySearchInput', { static: true}) categorySearchInput: ElementRef<HTMLInputElement>;
+  optionsCategory: { name: string; code: string }[] = [];
+  @ViewChild('categorySearchInput', { static: true }) categorySearchInput: ElementRef<HTMLInputElement>;
 
   searchGiftAddOnsCtrl = new FormControl();
   searchDiscountsCtrl = new FormControl();
@@ -87,25 +87,25 @@ export class ProductDetailsComponent implements OnInit {
     giftAddOns: GiftAddOns[];
     discounts: Discounts[];
   } = {
-    giftAddOns: [],
-    discounts: []
-  };
+      giftAddOns: [],
+      discounts: []
+    };
 
   filterOptions: {
     giftAddOns: GiftAddOns[];
     discounts: Discounts[];
   } = {
-    giftAddOns: [],
-    discounts: []
-  };
+      giftAddOns: [],
+      discounts: []
+    };
 
   loadingOptions: {
     giftAddOns: boolean;
     discounts: boolean
   } = {
-    giftAddOns: false,
-    discounts: false,
-  };
+      giftAddOns: false,
+      discounts: false,
+    };
   constructor(
     private productService: ProductService,
     private categoryService: CategoryService,
@@ -146,28 +146,29 @@ export class ProductDetailsComponent implements OnInit {
     return this.productForm.valid && this.categorySearchCtrl.valid && (this.productForm.dirty || this.categorySearchCtrl.dirty);
   }
   get formData() {
+    console.log(`this.productForm.controls["categoryId"].value `, this.productForm.controls["categoryId"].value);
     const data = this.productForm.value;
     data.price = data?.price?.toString();
-    data.selectedGiftAddOns = (data.selectedGiftAddOns??[]) as GiftAddOns[];
-    data.selectedDiscounts = (data.selectedDiscounts??[]) as Discounts[];
-    data.giftAddOnsAvailable = ((data.selectedGiftAddOns??[]) as GiftAddOns[]).map(x=>x.giftAddOnId);
-    data.discountTagsIds = ((data.selectedDiscounts??[]) as Discounts[]).map(x=>x.discountId);
+    data.selectedGiftAddOns = (data.selectedGiftAddOns ?? []) as GiftAddOns[];
+    data.selectedDiscounts = (data.selectedDiscounts ?? []) as Discounts[];
+    data.giftAddOnsAvailable = ((data.selectedGiftAddOns ?? []) as GiftAddOns[]).map(x => x.giftAddOnId);
+    data.discountTagsIds = ((data.selectedDiscounts ?? []) as Discounts[]).map(x => x.discountId);
     return data;
   }
 
   async ngOnInit(): Promise<void> {
     this.isLoading = true;
-    if(!this.isNew) {
+    if (!this.isNew) {
       await this.initDetails();
     }
     this.categorySearchCtrl.valueChanges
-    .pipe(
+      .pipe(
         debounceTime(2000),
         distinctUntilChanged()
-    )
-    .subscribe(async value => {
+      )
+      .subscribe(async value => {
         await this.initCategoryOptions();
-    });
+      });
     await this.initCategoryOptions();
     await this.initMultiSelect();
     this.isLoading = false;
@@ -179,15 +180,15 @@ export class ProductDetailsComponent implements OnInit {
         this.productService.getByCode(this.sku).toPromise(),
         this.categoryService.getAdvanceSearch({
           keywords: this.categorySearchInput.nativeElement.value,
-            order: {
-              "name": "ASC"
-            } as any,
+          order: {
+            "name": "ASC"
+          } as any,
           pageIndex: 0,
-          pageSize: 10
+          pageSize: 0
         })
-      ]).subscribe(([product, categoryOptions])=> {
-        if(categoryOptions.success) {
-          this.optionsCategory = categoryOptions.data.results.map(x=> {
+      ]).subscribe(([product, categoryOptions]) => {
+        if (categoryOptions.success) {
+          this.optionsCategory = categoryOptions.data.results.map(x => {
             return { name: x.name, code: x.categoryId }
           });
         }
@@ -203,13 +204,13 @@ export class ProductDetailsComponent implements OnInit {
             longDesc: product.data.longDesc,
             categoryId: product.data.category?.categoryId,
             updateImage: false,
-            productImages: product.data.productImages.map(x=> {
+            productImages: product.data.productImages.map(x => {
               return {
                 fileName: x?.file?.fileName,
                 base64: "",
                 dataURL: x?.file?.url,
                 guid: x?.file?.guid,
-                sequenceId: x?.file?.sequenceId??"0",
+                sequenceId: x?.file?.sequenceId ?? "0",
                 noChanges: true,
               }
             }),
@@ -223,7 +224,12 @@ export class ProductDetailsComponent implements OnInit {
             this.searchGiftAddOnsCtrl.disable();
             this.searchDiscountsCtrl.disable();
           }
-          this.categorySearchCtrl.setValue(product.data.category?.categoryId);
+          // this.categorySearchCtrl.setValue(product.data.category?.name);
+          this.categorySearchCtrl.setValue({
+            name: product.data.category?.name,
+            code: product.data.category?.categoryId
+          });
+
           this.productForm.markAsPristine();
           this.productForm.markAsUntouched();
           this.isLoading = false;
@@ -235,7 +241,7 @@ export class ProductDetailsComponent implements OnInit {
           });
         }
       });
-    } catch(ex) {
+    } catch (ex) {
       this.isLoading = false;
       this.error = Array.isArray(ex.message) ? ex.message[0] : ex.message;
       this.snackBar.open(this.error, 'close', {
@@ -246,14 +252,14 @@ export class ProductDetailsComponent implements OnInit {
 
   onShowImageViewer() {
     const dialogRef = this.dialog.open(ImageViewerDialogComponent, {
-        disableClose: true,
-        panelClass: "image-viewer-dialog"
+      disableClose: true,
+      panelClass: "image-viewer-dialog"
     });
     const img: HTMLImageElement = document.querySelector(".profile-pic img");
     dialogRef.componentInstance.imageSource = img?.src;
     dialogRef.componentInstance.canChange = false;
 
-    dialogRef.componentInstance.changed.subscribe(res=> {
+    dialogRef.componentInstance.changed.subscribe(res => {
       this.productThumbnailLoaded = false;
       this.productThumbnailSource = res.base64;
       dialogRef.close();
@@ -269,13 +275,13 @@ export class ProductDetailsComponent implements OnInit {
     this.isOptionsCategoryLoading = true;
     const res = await this.categoryService.getAdvanceSearch({
       keywords: this.categorySearchInput.nativeElement.value,
-        order: {
-          "name": "ASC"
-        } as any,
+      order: {
+        "name": "ASC"
+      } as any,
       pageIndex: 0,
       pageSize: 10
     }).toPromise();
-    this.optionsCategory = res.data.results.map(a=> { return { name: a.name, code: a.categoryId }});
+    this.optionsCategory = res.data.results.map(a => { return { name: a.name, code: a.categoryId } });
     this.mapSearchCategory();
     this.isOptionsCategoryLoading = false;
   }
@@ -295,7 +301,7 @@ export class ProductDetailsComponent implements OnInit {
 
   fetchMultiOptions(query: string, type: "gift-add-ons" | "discounts"): Observable<GiftAddOns[]> | Observable<Discounts[]> {
     if (!query || query === "") return of([] as any[]);
-    if(type === "gift-add-ons") {
+    if (type === "gift-add-ons") {
       return this.giftAddOnsService.getAdvanceSearch({
         keywords: query,
         order: {
@@ -305,8 +311,8 @@ export class ProductDetailsComponent implements OnInit {
         pageSize: 10,
       }).pipe(
         map((res: ApiResponse<{
-            results: GiftAddOns[];
-            total: number;
+          results: GiftAddOns[];
+          total: number;
         }>) => {
           if (res.success) {
             return res.data.results;
@@ -314,7 +320,7 @@ export class ProductDetailsComponent implements OnInit {
           return [];
         })
       );
-    } else if(type === "discounts") {
+    } else if (type === "discounts") {
       return this.discountsService.getAdvanceSearch({
         keywords: query,
         order: {
@@ -324,8 +330,8 @@ export class ProductDetailsComponent implements OnInit {
         pageSize: 10,
       }).pipe(
         map((res: ApiResponse<{
-            results: Discounts[];
-            total: number;
+          results: Discounts[];
+          total: number;
         }>) => {
           if (res.success) {
             return res.data.results;
@@ -339,7 +345,7 @@ export class ProductDetailsComponent implements OnInit {
   }
 
   toggleMultiSelection(option: GiftAddOns | Discounts, type: "gift-add-ons" | "discounts") {
-    if(type === "gift-add-ons") {
+    if (type === "gift-add-ons") {
       const index = this.formData.selectedGiftAddOns.findIndex(o => o.giftAddOnId === (option as GiftAddOns).giftAddOnId);
       if (index > -1) {
         const currentSelected = this.formData.selectedGiftAddOns;
@@ -352,7 +358,7 @@ export class ProductDetailsComponent implements OnInit {
         this.productForm.get("selectedGiftAddOns").setValue(currentSelected);
         this.productForm.get("selectedGiftAddOns").markAsDirty();
       }
-    } else if(type === "discounts") {
+    } else if (type === "discounts") {
       const index = this.formData.selectedDiscounts.findIndex(o => o.discountId === (option as Discounts).discountId);
       if (index > -1) {
         const currentSelected = this.formData.selectedDiscounts;
@@ -368,38 +374,39 @@ export class ProductDetailsComponent implements OnInit {
     }
   }
 
-  isSelectedMultiSelect(option: GiftAddOns| Discounts, type: "gift-add-ons" | "discounts"): boolean {
-    if(type === "gift-add-ons") {
-    return this.formData.selectedGiftAddOns.some(o => o.giftAddOnId === (option as GiftAddOns).giftAddOnId);
-    } else if(type === "discounts") {
-    return this.formData.selectedDiscounts.some(o => o.discountId === (option as Discounts).discountId);
+  isSelectedMultiSelect(option: GiftAddOns | Discounts, type: "gift-add-ons" | "discounts"): boolean {
+    if (type === "gift-add-ons") {
+      return this.formData.selectedGiftAddOns.some(o => o.giftAddOnId === (option as GiftAddOns).giftAddOnId);
+    } else if (type === "discounts") {
+      return this.formData.selectedDiscounts.some(o => o.discountId === (option as Discounts).discountId);
     } else {
       return false;
     }
   }
 
-  displayCategoryName(value?: number) {
-    return value ? this.optionsCategory.find(_ => _.code === value?.toString())?.name : undefined;
+  displayCategoryName(value?: { name: string; code: string }): string {
+    return value?.name ?? '';
+  }
+
+  onCategorySelected(value?: number) {
+    const category = this.optionsCategory.find(_ => _.code === value?.toString());
+    this.f['categoryId'].setValue(category);
+    this.categorySearchCtrl.setValue(category); // ensure the full object is set for displayWith
   }
 
   mapSearchCategory() {
-    if(this.f['categoryId'].value !== this.categorySearchCtrl.value) {
-      this.f['categoryId'].setErrors({ required: true});
-      const selected = this.optionsCategory.find(x=>x.code === this.categorySearchCtrl.value);
-      if(selected) {
-        this.f["categoryId"].setValue(selected.code);
-      } else {
-        this.f["categoryId"].setValue(null);
-      }
-      if(!this.f["categoryId"].value) {
-        this.f["categoryId"].setErrors({required: true});
-      } else {
-        this.f['categoryId'].setErrors(null);
-        this.f['categoryId'].markAsPristine();
-      }
+    const selected = this.optionsCategory.find(x => x.name === this.categorySearchCtrl.value?.name);
+    if (selected) {
+      this.f['categoryId'].setValue(selected.code);
+      this.categorySearchCtrl.setValue(selected);
+      this.f['categoryId'].setErrors(null);
+    } else {
+      this.f['categoryId'].setValue(null);
+      this.f['categoryId'].setErrors({ required: true });
     }
-    this.categorySearchCtrl.setErrors(this.f["categoryId"].errors);
+    this.categorySearchCtrl.setErrors(this.f['categoryId'].errors);
   }
+
 
   getError(key: string) {
     return this.f[key].errors;
@@ -434,8 +441,8 @@ export class ProductDetailsComponent implements OnInit {
       try {
         this.isProcessing = true;
         const params = this.formData;
-        let res:ApiResponse<Product>;
-        if(this.isNew) {
+        let res: ApiResponse<Product>;
+        if (this.isNew) {
           res = await this.productService.create(params).toPromise();
         } else {
           res = await this.productService.update(this.sku, params).toPromise();
@@ -458,12 +465,12 @@ export class ProductDetailsComponent implements OnInit {
             panelClass: ['style-error'],
           });
           dialogRef.close();
-          if(res?.message?.toString().toLowerCase().includes("already exist")) {
+          if (res?.message?.toString().toLowerCase().includes("already exist")) {
             this.productForm.get("name").setErrors({
               exist: true
             })
           }
-          if(res?.message?.toString().toLowerCase().includes("size must be") && res?.message?.toString().toLowerCase().includes("following values")) {
+          if (res?.message?.toString().toLowerCase().includes("size must be") && res?.message?.toString().toLowerCase().includes("following values")) {
             this.productForm.get("size").setErrors({
               invalid: true
             })
@@ -537,7 +544,7 @@ export class ProductDetailsComponent implements OnInit {
 
   onProductImageChanged(event) {
     this.productForm.get('updateImage').setValue(true);
-    if(event && event.length > 0) {
+    if (event && event.length > 0) {
       this.productForm.controls['productImages'].patchValue(event);
       this.productForm.controls['productImages'].markAsDirty();
       this.productForm.controls['productImages'].markAllAsTouched();
