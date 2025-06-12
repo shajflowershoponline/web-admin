@@ -77,7 +77,7 @@ export class SystemConfigComponent {
           const items = res.data.map((x: {
             index: number;
             key: string;
-            value: string;
+            value: any;
           }) => {
             let { key, value } = x;
             let title = x.key;
@@ -85,8 +85,13 @@ export class SystemConfigComponent {
             let sequence = 0;
             let canEdit = true;
             if (x.key === "DELIVERY_RATE") {
-              title = "(₱)Delivery Rate by KM ";
+              title = "Base Rate and Delivery Rate by KM ";
               sequence = 0;
+              const { min, rateByKm } = JSON.parse(value);
+              value = {
+                min: min??0,
+                rateByKm: rateByKm??0
+              };
             } else if (x.key === "STORE_LOCATION_NAME") {
               title = "Location Address";
               sequence = 1;
@@ -292,8 +297,9 @@ export class SystemConfigComponent {
   }
 
   onMapReady(locationMapViewer: LocationMapViewerComponent) {
-    locationMapViewer.updateLocation(this.selectedCoords.lat, this.selectedCoords.lng);
-    this.placesService = new google.maps.places.PlacesService(locationMapViewer.map.googleMap);
+    this.locationMapViewer = locationMapViewer;
+    this.locationMapViewer.updateLocation(this.selectedCoords.lat, this.selectedCoords.lng);
+    this.placesService = new google.maps.places.PlacesService(this.locationMapViewer.map.googleMap);
   }
 
   onSlideFileChange(event, slide: 1 | 2) {

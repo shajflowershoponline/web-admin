@@ -21,7 +21,8 @@
               item.edit = false;
               item.dirty = false;
               item.value = this.originalConfigs[$index].value;
-              item.key === 'CLIENT_SITE_HISTORY_CONTENTS' ? sendMessageToIframe(prod ? 'https://shaj-flower-shop-web-client-ochre.vercel.app/history' : 'http://localhost:4200/history', item?.value, 'reload') : false
+              item.key === 'CLIENT_SITE_HISTORY_CONTENTS' ? sendMessageToIframe(prod ? 'https://shaj-flower-shop-web-client-ochre.vercel.app/history' : 'http://localhost:4200/history', item?.value, 'reload') : false;
+              item.key === 'STORE_LOCATION_COORDS' ? locationMapViewer.updateLocation({ lat: this.originalConfigs[$index].split(', ')[0], lng: this.originalConfigs[$index].split(', ')[1] }) : false;
               ">
                 <mat-icon>close</mat-icon>
               </button>
@@ -34,7 +35,43 @@
             }
           </div>
           <div class="settings-item-content">
-            <ng-container *ngIf="item?.key === 'DELIVERY_RATE' ||
+            <ng-container *ngIf="item?.key === 'DELIVERY_RATE'">
+              @if(item?.edit) {
+                <div fxLayout="column" fxLayoutGap="16px">
+                  <mat-form-field appearance="outline" fxFlex.gt-sm="100%" fxFlex="100" class="cell"
+                    [ngClass.gt-sm]="{ isLargeScreen: true }">
+                    <mat-label>Base Rate</mat-label>
+                    <input matInput placeholder="Base Rate" type="number" [(ngModel)]="item.value.min" #modelDeliveryBase="ngModel" required
+                      (ngModelChange)="item.dirty = true;item.valid = item.value.min !== ''" />
+
+                    <mat-error *ngIf="modelDeliveryBase.invalid && modelDeliveryBase.touched">
+                      Base Rate is required.
+                    </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" fxFlex.gt-sm="100%" fxFlex="100" class="cell"
+                    [ngClass.gt-sm]="{ isLargeScreen: true }">
+                    <mat-label>Rate per km</mat-label>
+                    <input matInput placeholder="Rate per km" type="number" [(ngModel)]="item.value.rateByKm" #modelDeliveryRatePerKM="ngModel" required
+                      (ngModelChange)="item.dirty = true;item.valid = item.value.rateByKm !== ''" />
+
+                    <mat-error *ngIf="modelDeliveryRatePerKM.invalid && modelDeliveryRatePerKM.touched">
+                      Rate per km is required.
+                    </mat-error>
+                  </mat-form-field>
+
+                </div>
+              } @else {
+                <span>
+                  Base Rate: {{item?.value?.min | currency: 'PHP'}}
+                </span>
+                <br>
+                <span>
+                  Rate per km: {{item?.value?.rateByKm | currency: 'PHP'}}
+                </span>
+              }
+            </ng-container>
+            <ng-container *ngIf="
               item?.key === 'SOCIAL_FACEBOOK_LINK' ||
               item?.key === 'STORE_SUPPORT_EMAIL' ||
               item?.key === 'STORE_MOBILE_NUMBER'">
@@ -51,18 +88,23 @@
               </mat-form-field>
 
               } @else {
-              @if (item?.key === 'SOCIAL_FACEBOOK_LINK') {
-              <a href="{{item?.value}}" target="_blank">{{item?.value}}</a>
-              } @else {
-              <span class="settings-item-content-text">
-                @if(item?.key === 'DELIVERY_RATE') {
-                {{item?.value | currency: 'PHP'}}
+                @if (item?.key === 'SOCIAL_FACEBOOK_LINK') {
+                <a href="{{item?.value}}" target="_blank">{{item?.value}}</a>
                 } @else {
-                {{item?.value}}
+                <span class="settings-item-content-text">
+                  @if(item?.key === 'DELIVERY_RATE') {
+                    <span>
+                      Base Rate: {{item?.value?.min | currency: 'PHP'}}
+                    </span>
+                    <br>
+                    <span>
+                      Rate per km: {{item?.value?.rateByKm | currency: 'PHP'}}
+                    </span>
+                  } @else {
+                  {{item?.value}}
+                  }
+                </span>
                 }
-              </span>
-              }
-
               }
             </ng-container>
             <ng-container *ngIf="item?.key === 'STORE_LOCATION_NAME'">
