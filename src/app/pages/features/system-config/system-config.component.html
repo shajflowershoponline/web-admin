@@ -78,16 +78,20 @@
                 </mat-error>
               </mat-form-field>
               <mat-autocomplete #auto="matAutocomplete">
-                <mat-option (click)="onAddressSelected(option)" *ngFor="let option of locationOptions"
-                  [value]="option.label">
-                  {{ option.label }}
+                <mat-option (click)="onAddressSelected(option)" *ngFor="let option of placeResults"
+                  [value]="option?.description">
+                  <span style="display: flex; flex-direction: column;">
+                    <strong>{{ option?.main_text }}</strong>
+                    <span>{{ option?.description }}</span>
+                  </span>
                 </mat-option>
               </mat-autocomplete>
               } @else {
               <span class="settings-item-content-text">{{item?.value}}</span>
               }
-              <app-location-map-viewer #locationMapViewer [readOnly]="item.edit"
-                (onMarkerChange)="onMarkerChanged($event)" [selectedCoords]="selectedCoords"></app-location-map-viewer>
+              <app-location-map-viewer *ngIf="selectedCoords?.lat && selectedCoords?.lng" #locationMapViewer
+                [isReadOnly]="!item.edit" (mapReady)="onMapReady(locationMapViewer)"
+                (onMarkerChange)="onMarkerChanged($event)"></app-location-map-viewer>
             </ng-container>
             <ng-container *ngIf="item?.key === 'CLIENT_SITE_SLIDES_CONTENTS'">
               <div fxLayout="column" fxFlex="100" fxLayoutGap="16px">
@@ -98,7 +102,8 @@
                       <span>Slide 1</span>
                       <mat-form-field appearance="outline" fxFlex="100">
                         <mat-label>Title</mat-label>
-                        <input matInput placeholder="Title" [(ngModel)]="item.value['1']['title']" #title1Model="ngModel" required
+                        <input matInput placeholder="Title" [(ngModel)]="item.value['1']['title']"
+                          #title1Model="ngModel" required
                           (ngModelChange)="item.dirty = true;item.valid = title1Model.value && title1Model.value !== ''" />
                         <mat-error *ngIf="title1Model.invalid && title1Model.touched">
                           Title is required.
@@ -106,8 +111,9 @@
                       </mat-form-field>
                       <mat-form-field appearance="outline" fxFlex="100">
                         <mat-label>Description</mat-label>
-                        <textarea style="height: 200px;" matInput placeholder="Description" [(ngModel)]="item.value['1']['description']" #description1Model="ngModel" required
-                          (ngModelChange)="item.dirty = true;item.valid = description1Model.value && description1Model.value !== ''" ></textarea>
+                        <textarea style="height: 200px;" matInput placeholder="Description"
+                          [(ngModel)]="item.value['1']['description']" #description1Model="ngModel" required
+                          (ngModelChange)="item.dirty = true;item.valid = description1Model.value && description1Model.value !== ''"></textarea>
                         <mat-error *ngIf="description1Model.invalid && description1Model.touched">
                           Description is required.
                         </mat-error>
@@ -132,18 +138,18 @@
                           <span style="max-width: 500px;">{{item.value['1']['description']}}</span>
                         </div>
                         <div style="width: 100%;display: flex;">
-                          <button
-                            mat-icon-button
-                            (click)="slide1FileUpload.click()"
-                            *ngIf="item?.edit"
-                            style="
+                          <button mat-icon-button (click)="slide1FileUpload.click()" *ngIf="item?.edit" style="
                             position: absolute;
                             right: 0;
                             z-index: 10;">
                             <mat-icon>upload_file</mat-icon>
                           </button>
-                          <input #slide1FileUpload style="display: none!important;" type="file" (change)="onSlideFileChange($event, 1)" [accept]="acceptedTypes" />
-                          <img (error)="pictureErrorHandler($event)" style="width: 100%;max-height:300px;object-fit: cover;" [src]="item?.value['1']['image'] ? item?.value['1']['image'] : 'https://shaj-flower-shop-web-client-ochre.vercel.app/1-1.064affb871dee5ad.jpg'" alt="">
+                          <input #slide1FileUpload style="display: none!important;" type="file"
+                            (change)="onSlideFileChange($event, 1)" [accept]="acceptedTypes" />
+                          <img (error)="pictureErrorHandler($event)"
+                            style="width: 100%;max-height:300px;object-fit: cover;"
+                            [src]="item?.value['1']['image'] ? item?.value['1']['image'] : 'https://shaj-flower-shop-web-client-ochre.vercel.app/1-1.064affb871dee5ad.jpg'"
+                            alt="">
                         </div>
                       </div>
                     </div>
@@ -156,7 +162,8 @@
                       <span>Slide 2</span>
                       <mat-form-field appearance="outline" fxFlex="100">
                         <mat-label>Title</mat-label>
-                        <input matInput placeholder="Title" [(ngModel)]="item.value['2']['title']" #title2Model="ngModel" required
+                        <input matInput placeholder="Title" [(ngModel)]="item.value['2']['title']"
+                          #title2Model="ngModel" required
                           (ngModelChange)="item.dirty = true;item.valid = title2Model.value && title2Model.value !== ''" />
                         <mat-error *ngIf="title2Model.invalid && title2Model.touched">
                           Title is required.
@@ -164,8 +171,9 @@
                       </mat-form-field>
                       <mat-form-field appearance="outline" fxFlex="100">
                         <mat-label>Description</mat-label>
-                        <textarea style="height: 200px;" matInput placeholder="Description" [(ngModel)]="item.value['2']['description']" #description2Model="ngModel" required
-                          (ngModelChange)="item.dirty = true;item.valid = description2Model.value && description2Model.value !== ''" ></textarea>
+                        <textarea style="height: 200px;" matInput placeholder="Description"
+                          [(ngModel)]="item.value['2']['description']" #description2Model="ngModel" required
+                          (ngModelChange)="item.dirty = true;item.valid = description2Model.value && description2Model.value !== ''"></textarea>
                         <mat-error *ngIf="description2Model.invalid && description2Model.touched">
                           Description is required.
                         </mat-error>
@@ -190,18 +198,18 @@
                           <span style="max-width: 500px;">{{item.value['2']['description']}}</span>
                         </div>
                         <div style="width: 100%;display: flex;">
-                          <button
-                            mat-icon-button
-                            (click)="slide2FileUpload.click()"
-                            *ngIf="item?.edit"
-                            style="
+                          <button mat-icon-button (click)="slide2FileUpload.click()" *ngIf="item?.edit" style="
                             position: absolute;
                             right: 0;
                             z-index: 10;">
                             <mat-icon>upload_file</mat-icon>
                           </button>
-                          <input #slide2FileUpload style="display: none!important;" type="file" (change)="onSlideFileChange($event, 2)" [accept]="acceptedTypes" />
-                          <img (error)="pictureErrorHandler($event)" style="width: 100%;max-height:300px;object-fit: cover;" [src]="item?.value['2']['image'] ? item?.value['2']['image']  : 'https://shaj-flower-shop-web-client-ochre.vercel.app/1-2.b77f7996de58a054.jpg'" alt="">
+                          <input #slide2FileUpload style="display: none!important;" type="file"
+                            (change)="onSlideFileChange($event, 2)" [accept]="acceptedTypes" />
+                          <img (error)="pictureErrorHandler($event)"
+                            style="width: 100%;max-height:300px;object-fit: cover;"
+                            [src]="item?.value['2']['image'] ? item?.value['2']['image']  : 'https://shaj-flower-shop-web-client-ochre.vercel.app/1-2.b77f7996de58a054.jpg'"
+                            alt="">
                         </div>
                       </div>
                     </div>
@@ -290,7 +298,8 @@
                     <mat-form-field appearance="outline" fxFlex.gt-sm="100%" fxFlex="100" class="cell"
                       [ngClass.gt-sm]="{ isLargeScreen: true }">
                       <mat-label>Title</mat-label>
-                      <input matInput placeholder="Title" [(ngModel)]="item.value['title']" #titleModel="ngModel" required
+                      <input matInput placeholder="Title" [(ngModel)]="item.value['title']" #titleModel="ngModel"
+                        required
                         (ngModelChange)="item.dirty = true;item.valid = titleModel.value && titleModel.value !== ''" />
                       <mat-error *ngIf="titleModel.invalid && titleModel.touched">
                         Title is required.
@@ -301,8 +310,9 @@
                     <mat-form-field appearance="outline" fxFlex.gt-sm="100%" fxFlex="100" class="cell"
                       [ngClass.gt-sm]="{ isLargeScreen: true }">
                       <mat-label>Description</mat-label>
-                      <textarea style="height: 200px;" matInput placeholder="Description" [(ngModel)]="item.value['description']" #descriptionModel="ngModel" required
-                        (ngModelChange)="item.dirty = true;item.valid = descriptionModel.value && descriptionModel.value !== ''" ></textarea>
+                      <textarea style="height: 200px;" matInput placeholder="Description"
+                        [(ngModel)]="item.value['description']" #descriptionModel="ngModel" required
+                        (ngModelChange)="item.dirty = true;item.valid = descriptionModel.value && descriptionModel.value !== ''"></textarea>
                       <mat-error *ngIf="descriptionModel.invalid && descriptionModel.touched">
                         Description is required.
                       </mat-error>
@@ -315,8 +325,7 @@
                   padding: 30px;
                   display: flex;
                   flex-direction: column;
-                  width: 100%!important;"
-                  [style]="{ 'width': !item?.edit ? '100%!important' : '50%!important'}">
+                  width: 100%!important;" [style]="{ 'width': !item?.edit ? '100%!important' : '50%!important'}">
                   <div class="desc-content">
                     <p style="margin-bottom: 10px;">
                       {{item?.value?.title}}

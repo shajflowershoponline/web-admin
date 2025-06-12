@@ -1,9 +1,9 @@
-import { Component, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Router } from '@angular/router';
-import { catchError, debounceTime, map, of, Subject, switchMap } from 'rxjs';
+import { catchError, debounceTime, map, of, ReplaySubject, Subject, switchMap } from 'rxjs';
 import { SystemConfig } from 'src/app/models/system-config';
 import { AppConfigService } from 'src/app/services/app-config.service';
 import { GeoLocationService } from 'src/app/services/geo-location.service';
@@ -32,14 +32,16 @@ export class SystemConfigView {
   }
 })
 export class SystemConfigComponent {
-  private searchSubject = new Subject<string>();
-  locationOptions: any[] = [];
   selectedCoords = { lat: 0, lng: 0 };
   systemConfigs: SystemConfigView[] = [];
   originalConfigs: SystemConfigView[] = [];
   isLoading = false;
   error;
   @ViewChild('locationMapViewer') locationMapViewer!: LocationMapViewerComponent;
+  autocompleteService = new google.maps.places.AutocompleteService();
+  geocoder = new google.maps.Geocoder();
+  placesService: google.maps.places.PlacesService;
+  placeResults: { description?: string; place_id: string; main_text?: string }[] = [];
 
   constructor(private systemConfigService: SystemConfigService,
     private geoLocationService: GeoLocationService,
@@ -47,7 +49,8 @@ export class SystemConfigComponent {
     private dialog: MatDialog,
     public appConfig: AppConfigService,
     private storageService: StorageService,
-    private readonly sanitizer: DomSanitizer,
+    private sanitizer: DomSanitizer,
+    private readonly cdr: ChangeDetectorRef,
     public router: Router) {
 
   }
@@ -60,11 +63,11 @@ export class SystemConfigComponent {
     //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
     //Add 'implements OnInit' to the class.
     this.loadSettings();
-    this.searchSubject.pipe(
-      debounceTime(500),
-      switchMap(text => this.geocodeAddress(text))
-    ).subscribe(results => this.locationOptions = results);
 
+  }
+  ngAfterViewInit(): void {
+    //Called after ngAfterContentInit when the component's view has been initialized. Applies to components only.
+    //Add 'implements AfterViewInit' to the class.
   }
 
   loadSettings() {
@@ -101,7 +104,6 @@ export class SystemConfigComponent {
               title = "Client Site: Slides contents";
               sequence = 4;
               value = JSON.parse(value);
-              console.log(key, value);
             } else if (x.key === "CLIENT_SITE_HISTORY_CONTENTS") {
               title = "Client Site: History Content";
               sequence = 5;
@@ -139,12 +141,15 @@ export class SystemConfigComponent {
           ).sort((a, b) => {
             return Number(a.sequence) - Number(b.sequence);
           });
+          this.originalConfigs = [];
+          this.systemConfigs = [];
 
           for (let item of items) {
             this.originalConfigs.push(JSON.parse(JSON.stringify(item)));
             this.systemConfigs.push(JSON.parse(JSON.stringify(item)));
           }
           this.isLoading = false;
+          this.cdr.detectChanges();
         } else {
           this.error = Array.isArray(res.message) ? res.message[0] : res?.message;
           this.snackBar.open(this.error, 'close', { panelClass: ['style-error'] });
@@ -209,30 +214,51 @@ export class SystemConfigComponent {
         lng: item.coordinates.lng
       }))),
       catchError(error => {
-        console.error('Geocode error:', error);
         return of([]); // fallback to empty array
       })
     );
   }
 
   onSearchAddressChange(value: any) {
-    // console.log(value);
     if (value && value !== '') {
-      this.searchSubject.next(value);
+
+      this.autocompleteService.getPlacePredictions(
+        { input: value },
+        (predictions, status) => {
+          if (status === google.maps.places.PlacesServiceStatus.OK) {
+            // Process the predictions (results)
+            this.placeResults = predictions.map(r => {
+              return {
+                description: r.description,
+                place_id: r.place_id,
+                main_text: r.structured_formatting.main_text
+              }
+            });
+          }
+        }
+      );
     } else {
-      this.locationOptions = []; // Hide dropdown
-      this.selectedCoords = null;
+      this.placeResults = []; // Hide dropdown
     }
+    this.cdr.detectChanges();
   }
 
-  onAddressSelected(option: { lat: number; lng: number; label: string }) {
-    if (option) {
-      this.systemConfigs.find(x => x.key === "STORE_LOCATION_NAME").value = option.label;
-      this.systemConfigs.find(x => x.key === "STORE_LOCATION_NAME").dirty = true;
-      this.locationOptions = []; // Hide dropdown
-      this.selectedCoords = { lat: option.lat, lng: option.lng };
-      this.locationMapViewer.updateMapPin(option.lat, option.lng);
-      this.systemConfigs.find(x => x.key === "STORE_LOCATION_NAME").valid = true;
+  onAddressSelected(location) {
+    if (location && location.place_id) {
+      this.placesService.getDetails({ placeId: location.place_id }, (place, status) => {
+        if (status === google.maps.places.PlacesServiceStatus.OK) {
+          // Get the coordinates
+          this.locationMapViewer.updateLocation(place.geometry.location.lat(), place.geometry.location.lng());
+          this.locationMapViewer.map.googleMap.setCenter(place.geometry.location);
+          this.selectedCoords = { lat: place.geometry.location.lat(), lng: place.geometry.location.lng() };
+
+          this.systemConfigs.find(x => x.key === "STORE_LOCATION_NAME").value = location.description;
+          this.systemConfigs.find(x => x.key === "STORE_LOCATION_NAME").dirty = true;
+          this.placeResults = []; // Hide dropdown
+          this.systemConfigs.find(x => x.key === "STORE_LOCATION_NAME").valid = true;
+          this.cdr.detectChanges();
+        }
+      });
     } else {
       this.systemConfigs.find(x => x.key === "STORE_LOCATION_NAME").valid = false;
     }
@@ -241,9 +267,6 @@ export class SystemConfigComponent {
   }
 
   sendMessageToIframe(url, data = null, action: "updateContent" | "reload") {
-    console.log("url ", url);
-    console.log("data ", data);
-    console.log("action ", action);
     const iframe = document.getElementById('historyIframe') as HTMLIFrameElement;
     if (iframe) {
       iframe.contentWindow?.postMessage({ action: action, data }, url);
@@ -268,9 +291,13 @@ export class SystemConfigComponent {
     });
   }
 
+  onMapReady(locationMapViewer: LocationMapViewerComponent) {
+    locationMapViewer.updateLocation(this.selectedCoords.lat, this.selectedCoords.lng);
+    this.placesService = new google.maps.places.PlacesService(locationMapViewer.map.googleMap);
+  }
+
   onSlideFileChange(event, slide: 1 | 2) {
     const _value = this.systemConfigs.find(x => x.key === "CLIENT_SITE_SLIDES_CONTENTS").value;
-    console.log("value[slide]", _value[slide]);
 
     const input = event.target as HTMLInputElement;
     if (!input.files?.length) return;

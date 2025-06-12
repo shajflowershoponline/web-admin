@@ -1,175 +1,129 @@
-import { Component, EventEmitter, Input, Output, AfterViewInit, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, Output, AfterViewInit, OnInit, ViewEncapsulation, ViewChild } from '@angular/core';
 import * as L from 'leaflet';
 import { HttpClient } from '@angular/common/http';
 import { GeoLocationService } from 'src/app/services/geo-location.service';
 import { v4 as uuidv4 } from 'uuid';
-
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'assets/img/leaflet-marker-icon-2x.png',
-  iconUrl: 'assets/img/leaflet-marker-icon.png',
-  shadowUrl: 'assets/img/leaflet-marker-shadow.png'
-});
+import { GoogleMap, GoogleMapsModule, MapMarker } from '@angular/google-maps';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Component({
   standalone: true,
+  imports: [
+    GoogleMapsModule
+  ],
   selector: 'app-location-map-viewer',
   templateUrl: './location-map-viewer.component.html',
-  styleUrls: ['./location-map-viewer.component.scss']
+  styleUrls: ['./location-map-viewer.component.scss'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class LocationMapViewerComponent implements OnInit, AfterViewInit {
   readonly mapId: string = 'map-' + uuidv4(); // ✅ Unique map ID using UUID
-  private map!: L.Map;
-  private marker!: L.Marker;
+  @ViewChild(GoogleMap, { static: false }) map: GoogleMap | undefined;
+  @ViewChild(MapMarker) marker!: MapMarker;
+  private readOnly = false;
+  zoom = 15;
+  @Input() center: google.maps.LatLngLiteral;
+  markerPosition: google.maps.LatLngLiteral;
 
-  currentCoords: { lat: number; lng: number } = { lat: 0, lng: 0 };
-  @Input() selectedCoords: { lat: number; lng: number } = { lat: 0, lng: 0 };
+  mapOptions: google.maps.MapOptions = this.getMapOptions();
+  markerOptions: google.maps.MarkerOptions = this.getMarkerOptions();
   @Output() onMarkerChange = new EventEmitter<{ lat: number; lng: number }>();
 
-  @Input() set readOnly(value: boolean) {
-    if(value) {
-      if(this.marker) {
-        this.marker.dragging.enable();
-        this.map.dragging.enable();
-        this.map.scrollWheelZoom.enable();
-        this.map.doubleClickZoom.enable();
-        this.map.boxZoom.enable();
-        this.map.keyboard.enable();
-        this.map.zoomControl.addTo(this.map);
-      }
-    } else {
-      if(this.marker) {
-        this.marker.dragging.disable();
-        this.map.dragging.disable();
-        this.map.scrollWheelZoom.disable();
-        this.map.doubleClickZoom.disable();
-        this.map.boxZoom.disable();
-        this.map.keyboard.disable();
-        this.map.zoomControl.remove();
-        this.addLocationButton();
-      }
-    }
+  @Input() set isReadOnly(value: boolean) {
+    this.readOnly = value;
+    this.mapOptions = this.getMapOptions();
+    this.markerOptions = this.getMarkerOptions();
   };
+
+  currentCoords: {
+    lat: number;
+    lng: number;
+  }
+
+  @Output() mapReady = new EventEmitter<void>();
   constructor(
     private http: HttpClient,
     private readonly geoLocationService: GeoLocationService
   ) {
     this.geoLocationService.data$.subscribe((pos: GeolocationPosition) => {
-      if (pos?.coords) {
-        const { latitude, longitude } = pos.coords;
-        this.currentCoords = { lat: latitude, lng: longitude };
-        if (!this.selectedCoords) {
-          this.selectedCoords = this.currentCoords;
-        }
-        this.initMap();
+      if (pos?.coords && (!this.currentCoords || !this.currentCoords?.lat || !this.currentCoords?.lng)) {
+        this.currentCoords = {
+          lat: pos.coords?.latitude,
+          lng: pos.coords?.longitude,
+        };
       }
     });
   }
 
   async ngOnInit(): Promise<void> {
+    this.geoLocationService.data$.subscribe((pos: GeolocationPosition) => {
+      if (pos?.coords) {
+        const { latitude, longitude } = pos.coords;
+        // this.initMap();
+      }
+    });
   }
+
 
   ngAfterViewInit(): void {
-    // Handle resize glitch if inside dialog/tab
-    setTimeout(() => {
-      if (this.map) this.map.invalidateSize();
-    }, 100);
+    this.mapOptions = this.getMapOptions();
+    // Ensures dragend works for some edge cases
+    if (this.marker?.marker) {
+      this.marker.marker.addListener('dragend', (event: google.maps.MapMouseEvent) => {
+        const lat = event.latLng?.lat();
+        const lng = event.latLng?.lng();
+        if (lat && lng) this.updateLocation(lat, lng);
+      });
+    }
+    this.mapReady.emit();
   }
 
-  initMap(): void {
-    if (!this.map && this.map === undefined) {
-      this.map = L.map(this.mapId, {
-        dragging: false,
-        scrollWheelZoom: false,
-        doubleClickZoom: false,
-        boxZoom: false,
-        keyboard: false,
-        zoomControl: false
-      }).setView([this.selectedCoords.lat, this.selectedCoords.lng], 15);
-
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors',
-      }).addTo(this.map);
-
-      if (!this.readOnly) {
-        this.addLocationButton();
-      }
-    }
-
-    if (!this.marker) {
-      this.marker = L.marker([this.selectedCoords.lat, this.selectedCoords.lng], {
-        draggable: false,
-      }).addTo(this.map);
-
-      this.marker.on('dragend', () => {
-        const { lat, lng } = this.marker.getLatLng();
-        this.selectedCoords = { lat, lng };
-        this.onMarkerChange.emit(this.selectedCoords);
-        this.updateMapPin(lat, lng);
-      });
-    } else {
-      this.marker.setLatLng([this.selectedCoords.lat, this.selectedCoords.lng]);
-    }
-
-    this.map.setView([this.selectedCoords.lat, this.selectedCoords.lng], 15);
-
-    if(this.readOnly) {
-      this.marker.dragging.disable();
-      this.map.dragging.disable();
-    } else {
-      this.marker.dragging.enabled();
-      this.map.dragging.enabled();
-    }
-  }
-
-  addLocationButton() {
-    const locateControl = new L.Control({ position: 'topleft' });
-
-    locateControl.onAdd = () => {
-      const div = L.DomUtil.create(
-        'div',
-        'leaflet-bar leaflet-control leaflet-control-custom'
-      );
-      div.innerHTML =
-        '<i class="fa fa-crosshairs" style="padding:8px; cursor:pointer;"></i>';
-
-      L.DomEvent.on(div, 'click', async () => {
-        this.geoLocationService.data$.subscribe({
-          next: (position: GeolocationPosition) => {
-            const lat = position.coords.latitude;
-            const lng = position.coords.longitude;
-
-            // Make sure map is correctly resized and focused
-            this.map.invalidateSize();
-            this.map.flyTo([lat, lng], 15, { animate: true });
-
-            if (this.marker) {
-              this.marker.setLatLng([lat, lng]);
-            } else {
-              this.marker = L.marker([lat, lng], { draggable: true }).addTo(this.map);
-            }
-
-            this.onMarkerChange.emit(this.selectedCoords);
-          },
-          error: (err) => {
-            alert('Unable to retrieve your location');
-            console.error(err);
-          },
-        });
-      });
-
-      return div;
+  getMapOptions(): google.maps.MapOptions {
+    return {
+      disableDefaultUI: true,
+      gestureHandling: this.readOnly ? 'none' : 'auto',
+      draggable: !this.readOnly,
+      clickableIcons: !this.readOnly,
+      zoomControl: false,
+      mapTypeControl: false,
+      fullscreenControl: false,
+      streetViewControl: false
     };
-
-    locateControl.addTo(this.map);
   }
 
-  updateMapPin(lat: number, lng: number) {
-    if (this.marker) {
-      this.marker.setLatLng([lat, lng]);
+  getMarkerOptions(): google.maps.MarkerOptions {
+    return {
+      draggable: !this.readOnly
+    };
+  }
+
+  onMapClick(event: google.maps.MapMouseEvent) {
+    if (this.readOnly || !event.latLng) return;
+    const lat = event.latLng.lat();
+    const lng = event.latLng.lng();
+    this.updateLocation(lat, lng);
+  }
+
+  onMarkerDragEnd(event: google.maps.MapMouseEvent) {
+    console.log(event);
+    if (!event.latLng) return;
+    const lat = event.latLng.lat();
+    const lng = event.latLng.lng();
+    this.onMarkerChange.emit({ lat, lng });
+    this.updateLocation(lat, lng);
+  }
+
+  updateLocation(lat: number, lng: number) {
+    if ((!lat || !lng) && this.currentCoords) {
+      lat = this.currentCoords.lat;
+      lng = this.currentCoords.lng;
     }
+    this.markerPosition = { lat, lng };
+    this.center = { lat, lng };
+
+    // Smooth fly-over animation
     if (this.map) {
-      this.map.flyTo([lat, lng], 15);
+      this.map.panTo({ lat, lng });
     }
-    this.selectedCoords = { lat, lng };
   }
 }
