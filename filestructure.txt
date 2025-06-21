@@ -367,6 +367,8 @@
                 |-- Poppins-Thin.ttf
                 |-- Poppins-ThinItalic.ttf
         |-- img
+            |-- 1-1.jpg
+            |-- 1-2.jpg
             |-- banner-square.png
             |-- banner-white.png
             |-- banner.png

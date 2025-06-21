@@ -323,7 +323,7 @@ export class SystemConfigComponent {
     reader.readAsDataURL(file);
   }
 
-  pictureErrorHandler(event, slide) {
-    event.target.src = slide === 1 ? 'https://shaj-flower-shop-web-client-ochre.vercel.app/1-1.064affb871dee5ad.jpg' : 'https://shaj-flower-shop-web-client-ochre.vercel.app/1-2.b77f7996de58a054.jpg';
+  pictureErrorHandler(event: Event, slide: number) {
+    (event.target as HTMLImageElement).src = slide === 1 ? '../../../../assets/img/1-1.jpg' : '../../../../assets/img/1-2.jpg';
   }
 }
