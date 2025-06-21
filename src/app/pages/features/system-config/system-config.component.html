@@ -190,7 +190,7 @@
                             (change)="onSlideFileChange($event, 1)" [accept]="acceptedTypes" />
                           <img (error)="pictureErrorHandler($event, 1)"
                             style="width: 100%;height:300px!important;object-fit: cover;"
-                            [src]="item?.value['1']['image'] ? item?.value['1']['image'] : 'https://shaj-flower-shop-web-client-ochre.vercel.app/1-1.064affb871dee5ad.jpg'"
+                            [src]="item?.value['1']['image'] ? item?.value['1']['image'] : 'https://shaj-flower-shop.vercel.app/1-1.064affb871dee5ad.jpg'"
                             alt="">
                         </div>
                       </div>
@@ -250,7 +250,7 @@
                             (change)="onSlideFileChange($event, 2)" [accept]="acceptedTypes" />
                           <img (error)="pictureErrorHandler($event, 2)"
                             style="width: 100%;height:300px!important;object-fit: cover;"
-                            [src]="item?.value['2']['image'] ? item?.value['2']['image']  : 'https://shaj-flower-shop-web-client-ochre.vercel.app/1-2.b77f7996de58a054.jpg'"
+                            [src]="item?.value['2']['image'] ? item?.value['2']['image']  : 'https://shaj-flower-shop.vercel.app/1-2.b77f7996de58a054.jpg'"
                             alt="">
                         </div>
                       </div>
@@ -270,7 +270,7 @@
                       <mat-label>Top title</mat-label>
                       <input matInput placeholder="Top title" [(ngModel)]="item.value['top']" #topModel="ngModel"
                         required
-                        (ngModelChange)="item.dirty = true;sendMessageToIframe(prod ? 'https://shaj-flower-shop-web-client-ochre.vercel.app/history' : 'http://localhost:4200/history', item?.value, 'updateContent');" />
+                        (ngModelChange)="item.dirty = true;sendMessageToIframe(prod ? 'https://shaj-flower-shop.vercel.app/history' : 'http://localhost:4200/history', item?.value, 'updateContent');" />
 
                       <mat-error *ngIf="topModel.invalid && topModel.touched">
                         Top title is required.
@@ -283,7 +283,7 @@
                       <mat-label>Main title</mat-label>
                       <input matInput placeholder="Main title" [(ngModel)]="item.value['title']"
                         #mainTitleModel="ngModel" required
-                        (ngModelChange)="item.dirty = true;sendMessageToIframe(prod ? 'https://shaj-flower-shop-web-client-ochre.vercel.app/history' : 'http://localhost:4200/history', item?.value , 'updateContent')" />
+                        (ngModelChange)="item.dirty = true;sendMessageToIframe(prod ? 'https://shaj-flower-shop.vercel.app/history' : 'http://localhost:4200/history', item?.value , 'updateContent')" />
 
                       <mat-error *ngIf="mainTitleModel.invalid && mainTitleModel.touched">
                         Main title is required.
@@ -296,7 +296,7 @@
                       <mat-label>Sub title</mat-label>
                       <input matInput placeholder="Sub title" [(ngModel)]="item.value['sub']" #subTitleModel="ngModel"
                         required
-                        (ngModelChange)="item.dirty = true;sendMessageToIframe(prod ? 'https://shaj-flower-shop-web-client-ochre.vercel.app/history' : 'http://localhost:4200/history', item?.value , 'updateContent')" />
+                        (ngModelChange)="item.dirty = true;sendMessageToIframe(prod ? 'https://shaj-flower-shop.vercel.app/history' : 'http://localhost:4200/history', item?.value , 'updateContent')" />
 
                       <mat-error *ngIf="subTitleModel.invalid && subTitleModel.touched">
                         Main title is required.
@@ -309,7 +309,7 @@
                       <mat-label>Description</mat-label>
                       <textarea matInput placeholder="Sub title" [(ngModel)]="item.value['description']"
                         #descriptionModel="ngModel" required
-                        (ngModelChange)="item.dirty = true;sendMessageToIframe(prod ? 'https://shaj-flower-shop-web-client-ochre.vercel.app/history' : 'http://localhost:4200/history', item?.value , 'updateContent')"
+                        (ngModelChange)="item.dirty = true;sendMessageToIframe(prod ? 'https://shaj-flower-shop.vercel.app/history' : 'http://localhost:4200/history', item?.value , 'updateContent')"
                         style="height: 200px;"></textarea>
 
                       <mat-error *ngIf="descriptionModel.invalid && descriptionModel.touched">
@@ -324,7 +324,7 @@
                     width="100%" height="500px" style="border: none;"></iframe>
 
                   <ng-template #prodContent>
-                    <iframe id="historyIframe" src="https://shaj-flower-shop-web-client-ochre.vercel.app/history"
+                    <iframe id="historyIframe" src="https://shaj-flower-shop.vercel.app/history"
                       width="100%" height="500px" style="border: none;"></iframe>
                   </ng-template>
                 </div>
