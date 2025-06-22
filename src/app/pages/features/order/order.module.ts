@@ -9,12 +9,14 @@ import { FlexLayoutModule } from '@ngbracket/ngx-layout';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { MaterialModule } from 'src/app/shared/material/material.module';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { OrderItemComponent } from './order-items/order-items.component';
 
 
 @NgModule({
   declarations: [
     OrderComponent,
     OrderDetailsComponent,
+    OrderItemComponent,
   ],
   imports: [
     CommonModule,

@@ -1,0 +1,51 @@
+<mat-card>
+  <mat-card-header>
+  </mat-card-header>
+  <mat-card-content fxFlex="100" fxLayout="column" >
+    <div fxFlex="100" fxLayout="column" class="request-inventoryRequestItems-card-inner">
+      <table class="table-request-inventoryRequestItems" mat-table [dataSource]="dataSource">
+        <!-- Page Column -->
+        <ng-container matColumnDef="name" [sticky]="true">
+          <th mat-header-cell *matHeaderCellDef [ngStyle]="{ 'width': '50%', 'min-width': '100px'}">Name</th>
+          <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+        </ng-container>
+        <ng-container matColumnDef="category">
+          <th mat-header-cell *matHeaderCellDef [ngStyle]="{ 'width': '30%'}">Category</th>
+          <td mat-cell *matCellDef="let element">{{ element.category }}</td>
+        </ng-container>
+        <ng-container matColumnDef="quantity">
+          <th mat-header-cell *matHeaderCellDef [ngStyle]="{ 'width': '10%'}">quantity</th>
+          <td mat-cell *matCellDef="let element">{{element.quantity}}x</td>
+        </ng-container>
+        <ng-container matColumnDef="size">
+          <th mat-header-cell *matHeaderCellDef [ngStyle]="{ 'width': '10%'}">Size</th>
+          <td mat-cell *matCellDef="let element">{{ element.size }}</td>
+        </ng-container>
+        <ng-container matColumnDef="price">
+          <th mat-header-cell *matHeaderCellDef [ngStyle]="{ 'width': '10%'}">Price</th>
+          <td mat-cell *matCellDef="let element">{{ element.price | currency: 'PHP' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="totalAmount">
+          <th mat-header-cell *matHeaderCellDef [ngStyle]="{ 'width': '10%'}">Amount</th>
+          <td mat-cell *matCellDef="let element">{{ element.totalAmount | currency: 'PHP' }}</td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+    </div>
+    <div class="table-no-data" *ngIf="dataSource.data.length === 0">
+      <span>No item added</span>
+    </div>
+    <br>
+    <div
+      fxFlex="33.33%"
+      fxLayout="column"
+      fxLayout.gt-xs="row">
+      <div>
+        <strong>Total Amount:</strong>&nbsp;
+        <span>{{ accTotalAmount | currency: 'PHP' }}</span>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

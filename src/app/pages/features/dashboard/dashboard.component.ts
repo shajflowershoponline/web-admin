@@ -16,6 +16,7 @@ import { StorageService } from 'src/app/services/storage.service';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { FormControl } from '@angular/forms';
+import { ChartConfiguration, ChartOptions } from 'chart.js';
 
 
 @Component({
@@ -68,4 +69,81 @@ export class DashboardComponent {
       return of(error.error as any);
     };
   }
+
+  cards = [
+    {
+      title: 'Total Sales',
+      value: '$171310000',
+      change: '↑ 12% from last week',
+      icon: 'attach_money',
+      colorClass: 'sales',
+      isNegative: false
+    },
+    {
+      title: 'Total Orders',
+      value: '286',
+      change: '↑ 8% from last week',
+      icon: 'shopping_bag',
+      colorClass: 'orders',
+      isNegative: false
+    },
+    {
+      title: 'Products',
+      value: '86',
+      change: '↓ 3% from last week',
+      icon: 'local_florist',
+      colorClass: 'products',
+      isNegative: true
+    },
+    {
+      title: 'Customers',
+      value: '487',
+      change: '↑ 15% from last week',
+      icon: 'people',
+      colorClass: 'customers',
+      isNegative: false
+    }
+  ];
+
+  revenueChartData: ChartConfiguration<'line'>['data'] = {
+    labels: ['May 15', 'May 20', 'May 25', 'May 30', 'Jun 5', 'Jun 10', 'Jun 15'],
+    datasets: [
+      {
+        label: 'Revenue',
+        data: [850, 1080, 1120, 890, 1190, 1230, 1050],
+        borderColor: '#4a7c59',
+        backgroundColor: 'rgba(74, 124, 89, 0.1)',
+        fill: true,
+        tension: 0.4,
+        pointRadius: 4
+      }
+    ]
+  };
+
+  productChartData: ChartConfiguration<'doughnut'>['data'] = {
+    labels: ['Rose Bouquet', 'Tulip Bouquet', 'Lily Arrangement', 'Sunflower Basket', 'Mixed Flowers'],
+    datasets: [{
+      label: 'Top Products',
+      data: [35, 25, 20, 10, 10],
+      backgroundColor: [
+        'rgba(255, 99, 132, 0.6)',
+        'rgba(54, 162, 235, 0.6)',
+        'rgba(255, 206, 86, 0.6)',
+        'rgba(75, 192, 192, 0.6)',
+        'rgba(153, 102, 255, 0.6)'
+      ],
+      borderColor: '#fff',
+      borderWidth: 2
+    }]
+  };
+
+  orders = [
+    { id: '#ORD-4567', customer: 'Sarah Johnson', date: 'Jun 12, 2023', amount: '$89.99', status: 'Completed' },
+    { id: '#ORD-4566', customer: 'Michael Brown', date: 'Jun 11, 2023', amount: '$124.50', status: 'Completed' },
+    { id: '#ORD-4565', customer: 'Emily Davis', date: 'Jun 11, 2023', amount: '$65.25', status: 'Pending' },
+    { id: '#ORD-4564', customer: 'Robert Wilson', date: 'Jun 10, 2023', amount: '$149.99', status: 'Failed' },
+    { id: '#ORD-4563', customer: 'Jennifer Lee', date: 'Jun 10, 2023', amount: '$79.99', status: 'Completed' },
+  ];
+
+  displayedColumns = ['id', 'customer', 'date', 'amount', 'status', 'action'];
 }

@@ -11,7 +11,7 @@ const routes: Routes = [
     data: { title: "Order" }
   },
   {
-    path: ':sku',
+    path: ':orderCode',
     component: OrderDetailsComponent,
     data: { title: "Order", details: true }
   }

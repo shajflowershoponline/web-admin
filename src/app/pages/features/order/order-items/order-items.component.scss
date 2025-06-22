@@ -1,0 +1,14 @@
+::ng-deep {
+  .request-inventoryRequestItems-card-inner {
+    overflow: auto;
+  }
+  ::ng-deep .inventory-request-items {
+    .mat-mdc-dialog-content {
+      padding-top: 20px!important;
+    }
+  }
+
+  .hidden {
+    display: none!important;
+  }
+}

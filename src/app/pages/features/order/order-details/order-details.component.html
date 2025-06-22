@@ -1,0 +1,110 @@
+<mat-toolbar color="#fff" class="mat-elevation-z4">
+  <button [disabled]="isLoading" style="margin-right: 10px!important;" mat-icon-button matTooltip="Back" routerLink="/incoming-inventory-request/{{
+      (
+        order?.status === 'PENDING' ||
+        order?.status === 'PROCESSING' ||
+        order?.status === 'DELIVERY'
+      ) ? order?.status.toLowerCase() : 'closed-request/' + order?.status.toLowerCase()}}">
+    <mat-icon>keyboard_arrow_left
+    </mat-icon>
+  </button>
+  <span>{{ '#' + orderCode }}</span>
+  <span class="toolbar-item-spacer"></span>
+  <div class="toolbar-action">
+    <button *ngIf="showAction('PROCESSING')" mat-flat-button color="primary" matTooltip="Mark as processing"
+      (click)="processStatus('PROCESSING')">
+      Process
+    </button>
+    <button *ngIf="showAction('DELIVERY')" mat-flat-button color="primary" matTooltip="Mark as out for delivery"
+      (click)="processStatus('DELIVERY')">
+      Mark as out for delivery
+    </button>
+  </div>
+</mat-toolbar>
+
+<div class="content">
+  <div class="inner-content">
+    <div fxFlex="100" fxLayout="row">
+      <div style=" display: flex; width: 100%; justify-content: flex-end;">
+        <button class="order-status {{order?.status?.toLowerCase()}}" aria-label="Close request"
+          matTooltip="{{order?.status?.toLowerCase()}}" mat-fab extended disableRipple>
+          <mat-icon>{{
+            (order?.status === 'PENDING' ? 'schedule' : '') ||
+            (order?.status === 'PROCESSING' ? 'history' : '') ||
+            (order?.status === 'DELIVERY' ? 'local_shipping' : '') ||
+            (order?.status === 'COMPLETED' ? 'check_circle' : '') ||
+            (order?.status === 'CANCELLED' ? 'not_interested' : '') }}</mat-icon>
+          {{
+          (order?.status === 'PENDING' ? 'Pending' : '') ||
+          (order?.status === 'PROCESSING' ? 'Processing' : '') ||
+          (order?.status === 'DELIVERY' ? 'Out for delivery' : '') ||
+          (order?.status === 'COMPLETED' ? 'Completed' : '') ||
+          (order?.status === 'CANCELLED' ? 'Cancelled' : '')}}
+        </button>
+      </div>
+    </div>
+    <h4 class="inner-content-title">Order details</h4>
+    <mat-card class="info-card">
+      <mat-card-content>
+        <div fxLayout="column">
+          <div fxLayout.gt-sm="row" fxLayout="column" fxFlex="100">
+            <div fxFlex="50%"><strong>Order Code:</strong> {{ order?.orderCode }}</div>
+            <div fxFlex="50%"><strong>Status:</strong> {{
+          (order?.status === 'PENDING' ? 'Pending' : '') ||
+          (order?.status === 'PROCESSING' ? 'Processing' : '') ||
+          (order?.status === 'DELIVERY' ? 'Out for delivery' : '') ||
+          (order?.status === 'COMPLETED' ? 'Completed' : '') ||
+          (order?.status === 'CANCELLED' ? 'Cancelled' : '')}}</div>
+          </div>
+          <div fxLayout.gt-sm="row" fxLayout="column" fxFlex="100">
+            <div fxFlex="50%"><strong>Date:</strong> {{ order?.createdAt | date }}</div>
+            <div fxFlex="50%"><strong>Payment Method:</strong> {{ order?.paymentMethod }}</div>
+          </div>
+          <div fxLayout.gt-sm="row" fxLayout="column" fxFlex="100">
+            <div fxFlex="50%"><strong>Delivery Address:</strong> {{ order?.deliveryAddress }}</div>
+            <div fxFlex="50%"><strong>Delivery Fee:</strong> {{ order?.deliveryFee | currency }}</div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <h4 class="inner-content-title">Customer</h4>
+    <mat-card class="info-card">
+      <mat-card-content>
+        <div fxLayout="column">
+          <div fxLayout.gt-sm="row" fxLayout="column" fxFlex="100">
+            <div fxFlex><strong>Customer Name:</strong> {{ order?.name }}</div>
+          </div>
+          <div fxLayout.gt-sm="row" fxLayout="column" fxFlex="100">
+            <div fxFlex="50%"><strong>Email:</strong> {{ order?.email }}</div>
+            <div fxFlex="50%"><strong>Phone:</strong> {{ order?.mobileNumber }}</div>
+          </div>
+          <div fxLayout.gt-sm="row" fxLayout="column" fxFlex="100">
+            <div fxFlex="50%"><strong>Delivery Address:</strong> {{ order?.deliveryAddress }}</div>
+            <div fxFlex="50%"><strong>Delivery Fee:</strong> {{ order?.deliveryFee | currency: 'PHP' }}</div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <div fxFlex="100" fxLayout="column" *ngIf="!isLoading &&
+    order?.status === 'CANCELLED'
+    ">
+      <h4 class="inner-content-title">Notes</h4>
+      <mat-card>
+        <mat-card-content>
+          <div fxFlex="100" fxLayout="column">
+            <mat-form-field fxFlex="100" fxLayout="column" appearance="outline">
+              <mat-label>Notes</mat-label>
+              <textarea matInput readonly placeholder="Notes.." [(ngModel)]="order.cancelReason">
+              </textarea>
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+    <h4 class="inner-content-title">Requested items</h4>
+    <app-order-items [order]="order" [isReadOnly]="true"
+      #orderItems></app-order-items>
+  </div>
+</div>

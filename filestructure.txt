@@ -130,6 +130,11 @@
                         |-- order-details.component.scss
                         |-- order-details.component.spec.ts
                         |-- order-details.component.ts
+                    |-- order-items
+                        |-- order-items.component.html
+                        |-- order-items.component.scss
+                        |-- order-items.component.spec.ts
+                        |-- order-items.component.ts
                     |-- order-routing.module.ts
                     |-- order.component.html
                     |-- order.component.scss

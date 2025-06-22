@@ -7,6 +7,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { MaterialModule } from 'src/app/shared/material/material.module';
 import { SharedModule } from 'src/app/shared/shared.module';
+import { NgChartsModule } from 'ng2-charts';
 
 export const routes: Routes = [
   {
@@ -24,6 +25,7 @@ export const routes: Routes = [
     CommonModule,
     FlexLayoutModule,
     MaterialModule,
+    NgChartsModule,
     NgxSkeletonLoaderModule,
     FormsModule,
     ReactiveFormsModule,

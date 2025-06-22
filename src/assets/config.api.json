@@ -65,7 +65,7 @@
     },
     "order": {
       "getByCode": "/order/",
-      "updateStatus": "/order/updateStatus/",
+      "updateStatus": "/order/status/",
       "getAdvanceSearch": "/order/page/"
     },
     "settings": {

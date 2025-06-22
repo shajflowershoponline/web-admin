@@ -1,16 +1,81 @@
 <div class="content">
-  <div class="inner-content dashboard">
-    <div class="error" *ngIf="error && error !== ''">
-      <br>
-      {{error}}
-      <button mat-icon-button aria-label="Clear" (click)="error=null">
-        <mat-icon>close</mat-icon>
-      </button>
+  <div class="inner-content">
+    <div fxFlex="column">
+      <!-- Cards -->
+      <div class="cards">
+        <div class="card" *ngFor="let card of cards">
+          <div class="card-header">
+            <div>
+              <div class="card-title">{{ card.title }}</div>
+              <div class="card-value">{{ card.value }}</div>
+              <div class="card-change" [class.negative]="card.isNegative">{{ card.change }}</div>
+            </div>
+            <div class="card-icon" [ngClass]="card.colorClass">
+              <mat-icon>{{ card.icon }}</mat-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="charts">
+        <div class="chart-container">
+          <h3 class="chart-title">Revenue Overview (Last 30 Days)</h3>
+          <canvas baseChart [data]="revenueChartData" chartType="line"></canvas>
+        </div>
+        <div class="chart-container">
+          <h3 class="chart-title">Top Products</h3>
+          <canvas baseChart [data]="productChartData" chartType="doughnut"></canvas>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="recent-orders">
+        <h3 class="section-title">Recent Orders</h3>
+        <table mat-table [dataSource]="orders" class="mat-elevation-z2 full-width">
+
+          <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef>Order ID</th>
+            <td mat-cell *matCellDef="let order">{{ order.id }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="customer">
+            <th mat-header-cell *matHeaderCellDef>Customer</th>
+            <td mat-cell *matCellDef="let order">{{ order.customer }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef>Date</th>
+            <td mat-cell *matCellDef="let order">{{ order.date }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="amount">
+            <th mat-header-cell *matHeaderCellDef>Amount</th>
+            <td mat-cell *matCellDef="let order">{{ order.amount }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let order">
+              <span class="order-status" [ngClass]="{
+                  'status-completed': order.status === 'Completed',
+                  'status-pending': order.status === 'Pending',
+                  'status-failed': order.status === 'Failed'
+                }">{{ order.status }}</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="action">
+            <th mat-header-cell *matHeaderCellDef>Action</th>
+            <td mat-cell *matCellDef="let order">
+              <mat-icon>more_vert</mat-icon>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </div>
     </div>
-    <div fxFlex="100" fxLayout="column" fxLayoutGap="16px">
-    </div>
-    <div fxFlex="100" fxLayout="column" fxLayoutGap="16px">
-    </div>
-    <br>
   </div>
 </div>

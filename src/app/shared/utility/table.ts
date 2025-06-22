@@ -118,3 +118,12 @@ export class OrderTableColumn {
   createdAt?: string;
   url?: string;
 }
+export class OrderItemTableColumn {
+  quantity: string;
+  sku: string;
+  name: string;
+  category: string;
+  price: string;
+  totalAmount: string;
+  size: string;
+}
