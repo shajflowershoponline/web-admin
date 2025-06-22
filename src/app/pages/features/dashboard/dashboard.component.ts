@@ -7,7 +7,7 @@ import * as ApexCharts from 'apexcharts';
 // the `default as` syntax.
 import * as _moment from 'moment';
 // tslint:disable-next-line:no-duplicate-imports
-import {  Moment } from 'moment';
+import { Moment } from 'moment';
 import * as moment from 'moment';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Observable, Subject, catchError, forkJoin, of, takeUntil } from 'rxjs';
@@ -73,7 +73,7 @@ export class DashboardComponent {
   cards = [
     {
       title: 'Total Sales',
-      value: '$171310000',
+      value: '₱23000',
       change: '↑ 12% from last week',
       icon: 'attach_money',
       colorClass: 'sales',
@@ -110,15 +110,38 @@ export class DashboardComponent {
     datasets: [
       {
         label: 'Revenue',
-        data: [850, 1080, 1120, 890, 1190, 1230, 1050],
+        data: [11335, 33059, 14938, 18901, 29478, 12030, 20150],
         borderColor: '#4a7c59',
         backgroundColor: 'rgba(74, 124, 89, 0.1)',
         fill: true,
         tension: 0.4,
         pointRadius: 4
       }
-    ]
+    ],
+
   };
+
+  revenueChartOptions: ChartOptions<'line'> = {
+    responsive: true,
+    plugins: {
+      legend: { display: false }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          callback: (value) => {
+            return '₱' + Number(value).toLocaleString(); // ✅ Currency with commas
+          },
+          color: '#333',
+          font: {
+            size: 12,
+          }
+        }
+      }
+    }
+  };
+
 
   productChartData: ChartConfiguration<'doughnut'>['data'] = {
     labels: ['Rose Bouquet', 'Tulip Bouquet', 'Lily Arrangement', 'Sunflower Basket', 'Mixed Flowers'],
@@ -138,11 +161,11 @@ export class DashboardComponent {
   };
 
   orders = [
-    { id: '#ORD-4567', customer: 'Sarah Johnson', date: 'Jun 12, 2023', amount: '$89.99', status: 'Completed' },
-    { id: '#ORD-4566', customer: 'Michael Brown', date: 'Jun 11, 2023', amount: '$124.50', status: 'Completed' },
-    { id: '#ORD-4565', customer: 'Emily Davis', date: 'Jun 11, 2023', amount: '$65.25', status: 'Pending' },
-    { id: '#ORD-4564', customer: 'Robert Wilson', date: 'Jun 10, 2023', amount: '$149.99', status: 'Failed' },
-    { id: '#ORD-4563', customer: 'Jennifer Lee', date: 'Jun 10, 2023', amount: '$79.99', status: 'Completed' },
+    { id: '#ORD-4567', customer: 'Sarah Johnson', date: 'Jun 12, 2023', amount: '₱89.99', status: 'Completed' },
+    { id: '#ORD-4566', customer: 'Michael Brown', date: 'Jun 11, 2023', amount: '₱124.50', status: 'Completed' },
+    { id: '#ORD-4565', customer: 'Emily Davis', date: 'Jun 11, 2023', amount: '₱65.25', status: 'Pending' },
+    { id: '#ORD-4564', customer: 'Robert Wilson', date: 'Jun 10, 2023', amount: '₱149.99', status: 'Failed' },
+    { id: '#ORD-4563', customer: 'Jennifer Lee', date: 'Jun 10, 2023', amount: '₱79.99', status: 'Completed' },
   ];
 
   displayedColumns = ['id', 'customer', 'date', 'amount', 'status', 'action'];
