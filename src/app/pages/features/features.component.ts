@@ -2,12 +2,10 @@ import { AfterViewInit, ChangeDetectorRef, Component, HostListener, OnInit } fro
 import { MatDialog } from '@angular/material/dialog';
 import { Title } from '@angular/platform-browser';
 import { Router, ResolveEnd, ActivatedRouteSnapshot, RouterEvent, NavigationStart, NavigationEnd, NavigationCancel, NavigationError, ActivatedRoute } from '@angular/router';
-import { OneSignal } from 'onesignal-ngx';
 import { filter } from 'rxjs';
 import { StaffUser } from 'src/app/models/staff-user';
 import { AppConfigService } from 'src/app/services/app-config.service';
 import { AuthService } from 'src/app/services/auth.service';
-import { OneSignalService } from 'src/app/services/one-signal.service';
 import { RouteService } from 'src/app/services/route.service';
 import { StorageService } from 'src/app/services/storage.service';
 import { AlertDialogModel } from 'src/app/shared/components/alert-dialog/alert-dialog-model';
@@ -35,7 +33,6 @@ export class FeaturesComponent implements OnInit, AfterViewInit{
   profileLoaded = false;
   disableToolBarShadow = false;
   constructor(
-    private oneSignalService:OneSignalService,
     private titleService:Title,
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
@@ -57,11 +54,6 @@ export class FeaturesComponent implements OnInit, AfterViewInit{
   }
   async ngOnInit(): Promise<void> {
     await this.getNotifCount();
-    await this.oneSignalService.init(this.profile);
-    this.oneSignalService.data$.subscribe(async res=> {
-      console.log("changes!");
-      await this.getNotifCount();
-    })
   }
 
   ngAfterViewInit(): void {

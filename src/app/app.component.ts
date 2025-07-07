@@ -6,7 +6,6 @@ import { RouteService } from './services/route.service';
 import { AppConfigService } from './services/app-config.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { StorageService } from './services/storage.service';
-import { OneSignal } from 'onesignal-ngx';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -17,7 +16,6 @@ export class AppComponent {
   grantNotif = false;
   showLoader = false;
   constructor(
-    private oneSignal: OneSignal,
     private titleService:Title,
     private router: Router,
     private snackBar:MatSnackBar,

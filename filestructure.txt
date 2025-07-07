@@ -253,8 +253,6 @@
             |-- gift-add-ons.service.ts
             |-- interface
                 |-- iservices.ts
-            |-- one-signal.service.spec.ts
-            |-- one-signal.service.ts
             |-- order.service.spec.ts
             |-- order.service.ts
             |-- product-collection.service.spec.ts
@@ -398,7 +396,6 @@
     |-- global.scss
     |-- index.html
     |-- main.ts
-    |-- OneSignalSDKWorker.js
     |-- styles.scss
 |-- tsconfig.app.json
 |-- tsconfig.json

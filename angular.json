@@ -32,8 +32,7 @@
                 "input": "public"
               },
               "src/favicon.ico",
-              "src/assets",
-              "src/OneSignalSDKWorker.js"
+              "src/assets"
             ],
             "styles": [
               "node_modules/leaflet/dist/leaflet.css",
