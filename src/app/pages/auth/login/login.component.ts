@@ -5,7 +5,6 @@ import { Validators, FormBuilder, FormGroup } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SpinnerVisibilityService } from 'ng-http-loader';
-import { OneSignal } from 'onesignal-ngx';
 import { AppConfigService } from 'src/app/services/app-config.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { StorageService } from 'src/app/services/storage.service';
@@ -25,7 +24,6 @@ export class LoginComponent {
   title;
 
   constructor(
-    private oneSignal: OneSignal,
     private formBuilder: FormBuilder,
     private route: ActivatedRoute,
     private http: HttpClient,
@@ -57,7 +55,6 @@ export class LoginComponent {
       this.authService.login(params)
         .subscribe(async res => {
           if (res.success) {
-            await this.oneSignal.login(res.data?.userName);
             this.storageService.saveLoginProfile(res.data);
             this.authService.redirectToPage(false);
             this.router.navigate(['/'], { replaceUrl: true,  onSameUrlNavigation: "reload" });
